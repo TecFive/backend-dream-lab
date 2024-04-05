@@ -1,0 +1,10 @@
+.idea
+.vscode
+/app/.env
+/app/.env.dev
+py3.11
+*.pyc
+*.pyo
+*.pyd
+**/__pycache__/
+__pycache__/
