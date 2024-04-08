@@ -43,5 +43,5 @@ app.include_router(
     reservation_controller.router,
     prefix="/v1/reservations",
     tags=["reservations"],
-    dependencies=PROTECTED
+    dependencies=None
 )

@@ -8,7 +8,7 @@ envFile = "app/.env.dev" if os.getenv("ENVIRONMENT") == "dev" else "app/.env"
 
 if not os.path.isfile(envFile):
     envFile = (
-        "/code/app/.env.dev" if os.getenv("ENVIRONMENT") == "dev" else "/code/app/.env"
+        "/code/app/...env.dev" if os.getenv("ENVIRONMENT") == "dev" else "/code/app/..env"
     )
 
     if not os.path.isfile(envFile):
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     AZURE_DATABASE_NAME: str = os.getenv("AZURE_DATABASE_NAME")
     AZURE_DATABASE_USER: str = os.getenv("AZURE_DATABASE_USER")
     AZURE_DATABASE_PASSWORD: str = os.getenv("AZURE_DATABASE_PASSWORD")
+    AZURE_DATABASE_DRIVER: str = os.getenv("AZURE_DATABASE_DRIVER")
 
     @staticmethod
     def get_current_time():
