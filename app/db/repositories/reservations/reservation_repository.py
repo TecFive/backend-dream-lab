@@ -19,6 +19,20 @@ class ReservationRepository:
         return reservations
 
     @staticmethod
+    def get_reservations_by_room_id(room_id: str):
+        connection = get_conn()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            f"SELECT * FROM Reservations WHERE room_id = '{room_id}'"
+        )
+
+        reservations = cursor.fetchall()
+        connection.close()
+
+        return reservations
+
+    @staticmethod
     def get_reservations_by_user_id(user_id: str):
         connection = get_conn()
         cursor = connection.cursor()

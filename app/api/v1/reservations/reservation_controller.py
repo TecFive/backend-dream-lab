@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.get("/my-reservations")
-async def get_reservations():
+async def get_my_reservations():
     connection = get_conn()
     cursor = connection.cursor()
 
