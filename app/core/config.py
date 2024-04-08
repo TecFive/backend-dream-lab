@@ -4,7 +4,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-envFile = ".env.dev" if os.getenv("ENVIRONMENT") == "dev" else ".env"
+envFile = "app/.env.dev" if os.getenv("ENVIRONMENT") == "dev" else "app/.env"
 
 if not os.path.isfile(envFile):
     envFile = (
