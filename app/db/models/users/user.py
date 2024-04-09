@@ -12,6 +12,7 @@ class User(BaseModel):
     career: str
     semester: int
     role: str
+    priority: int
     created_at: datetime
     updated_at: datetime
 
@@ -28,6 +29,7 @@ class User(BaseModel):
             career=user_persistence["career"],
             semester=user_persistence["semester"],
             role=user_persistence["role"],
+            priority=user_persistence["priority"],
             created_at=user_persistence["created_at"],
             updated_at=user_persistence["updated_at"]
         )

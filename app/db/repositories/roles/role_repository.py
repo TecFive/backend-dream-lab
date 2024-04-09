@@ -69,8 +69,9 @@ class RoleRepository:
         connection = get_conn()
         cursor = connection.cursor()
 
+        normalized_permissions = ",".join(role.permissions)
         cursor.execute(
-            f"INSERT INTO Roles (id, name, description, permissions, created_at, updated_at) VALUES ('{role.id}', '{role.name.upper()}', '{role.description}', '{role.permissions}', CAST('{role.created_at}' AS DATETIME2), CAST('{role.updated_at}' AS DATETIME2))"
+            f"INSERT INTO Roles (id, name, description, permissions, priority, created_at, updated_at) VALUES ('{role.id}', '{role.name.upper()}', '{role.description}', '{normalized_permissions}', '{role.priority}', CAST('{role.created_at}' AS DATETIME2), CAST('{role.updated_at}' AS DATETIME2))"
         )
 
         connection.commit()
@@ -81,8 +82,9 @@ class RoleRepository:
         connection = get_conn()
         cursor = connection.cursor()
 
+        normalized_permissions = ",".join(role.permissions)
         cursor.execute(
-            f"UPDATE Roles SET name = '{role.name.upper()}', description = '{role.description}', permissions = '{role.permissions}', updated_at = CAST('{role.updated_at}' AS DATETIME2) WHERE id = '{role.id}'"
+            f"UPDATE Roles SET name = '{role.name.upper()}', description = '{role.description}', permissions = '{normalized_permissions}', priority = '{role.priority}', updated_at = CAST('{role.updated_at}' AS DATETIME2) WHERE id = '{role.id}'"
         )
 
         connection.commit()

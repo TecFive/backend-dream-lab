@@ -7,6 +7,7 @@ from app.core.security import Security
 from app.db.models.users.user import User
 from app.db.repositories.roles.role_repository import RoleRepository
 from app.db.repositories.users.user_repository import UserRepository
+from app.dtos.roles.update_user_role_dto import UpdateUserRoleDto
 from app.dtos.users.create_user_dto import CreateUserDto
 from app.dtos.users.update_user_dto import UpdateUserDto
 
@@ -46,6 +47,8 @@ class UserService:
 
     def register_user(self, create_user_dto: CreateUserDto) -> User:
         role = self.role_repository.find_role_by_name("Student")
+        priority = role.priority
+
         user = User(
             id=str(bson.ObjectId()),
             name=create_user_dto.name,
@@ -54,6 +57,7 @@ class UserService:
             career=create_user_dto.career,
             semester=create_user_dto.semester,
             role=role.id,
+            priority=priority,
             created_at=datetime.now().isoformat(),
             updated_at=datetime.now().isoformat(),
         )
@@ -63,22 +67,38 @@ class UserService:
         return user
 
     def update_user(self, update_user_dto: UpdateUserDto) -> User:
-        user = self.find_user_by_id(update_user_dto.id)
+        user_found = self.find_user_by_id(update_user_dto.id)
 
-        if user is None:
+        if user_found is None:
             raise Exception("User could not be found")
 
-        user = User(
-            name=update_user_dto.name,
-            email=update_user_dto.email,
-            career=update_user_dto.career,
-            semester=update_user_dto.semester,
-            updated_at=datetime.now().isoformat(),
-        )
+        user_found.name = user_found.name
+        user_found.email = user_found.email
+        user_found.career = user_found.career
+        user_found.semester = user_found.semester
+        user_found.updated_at = datetime.now().isoformat()
 
-        self.user_repository.update_user(user)
+        self.user_repository.update_user(user_found)
 
-        return user
+        return user_found
+
+    def update_user_role(self, update_user_role_dto: UpdateUserRoleDto) -> User:
+        user_found = self.find_user_by_id(update_user_role_dto.id)
+        role_found = self.role_repository.find_role_by_id(update_user_role_dto.role_id)
+
+        if user_found is None:
+            raise Exception("User could not be found")
+
+        if role_found is None:
+            raise Exception("Role could not be found")
+
+        user_found.role = role_found.id
+        user_found.priority = role_found.priority
+        user_found.updated_at = datetime.now().isoformat()
+
+        self.user_repository.update_user(user_found)
+
+        return user_found
 
     def delete_user(self, user_id: str) -> bool:
         self.user_repository.delete_user(user_id)

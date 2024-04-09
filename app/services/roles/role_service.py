@@ -37,8 +37,9 @@ class RoleService:
             name=role.name,
             description=role.description,
             permissions=role.permissions,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            priority=role.priority,
+            created_at=datetime.now().isoformat(),
+            updated_at=datetime.now().isoformat()
         )
 
         self.role_repository.create_role(new_role)
@@ -52,6 +53,8 @@ class RoleService:
         role_found.name = role.name
         role_found.description = role.description
         role_found.permissions = role.permissions
+        role_found.priority = role.priority
+        role_found.updated_at = datetime.now().isoformat()
 
         self.role_repository.update_role(role_found)
 
