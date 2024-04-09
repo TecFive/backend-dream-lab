@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel
@@ -5,6 +6,14 @@ from pydantic import BaseModel
 
 class User(BaseModel):
     id: str
+    name: str
+    email: str
+    password: str
+    career: str
+    semester: int
+    role: str
+    created_at: datetime
+    updated_at: datetime
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -12,5 +21,13 @@ class User(BaseModel):
     @staticmethod
     def create_from_persistence(user_persistence) -> "User":
         return User(
-            id=user_persistence["_id"]
+            id=user_persistence["id"],
+            name=user_persistence["name"],
+            email=user_persistence["email"],
+            password=user_persistence["password"],
+            career=user_persistence["career"],
+            semester=user_persistence["semester"],
+            role=user_persistence["role"],
+            created_at=user_persistence["created_at"],
+            updated_at=user_persistence["updated_at"]
         )

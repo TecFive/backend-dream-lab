@@ -1,23 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.core.config import Settings
-from app.db.client import get_conn
-
+from app.db.models.users.user import User
+from app.dependency import get_current_user
+from app.services.reservations.reservation_service import ReservationService
 
 config = Settings()
 
 router = APIRouter()
+reservationService = ReservationService()
 
 
 @router.get("/my-reservations")
-async def get_my_reservations():
-    connection = get_conn()
-    cursor = connection.cursor()
-
-    cursor.execute(
-        f"SELECT * FROM reservacion WHERE id_usuario = 'asdf'"
-    )
-
-    result = cursor.fetchall()
-    connection.close()
-
-    return result
+async def get_my_reservations(current_user: User = Depends(get_current_user)):
+    pass

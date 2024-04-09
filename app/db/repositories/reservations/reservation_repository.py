@@ -1,3 +1,5 @@
+from typing import List
+
 from app.db.client import get_conn
 from app.db.models.reservations.reservation import Reservation
 
@@ -5,7 +7,7 @@ from app.db.models.reservations.reservation import Reservation
 # All static methods
 class ReservationRepository:
     @staticmethod
-    def get_all_reservations():
+    def get_all_reservations() -> List[Reservation]:
         connection = get_conn()
         cursor = connection.cursor()
 
@@ -13,13 +15,18 @@ class ReservationRepository:
             f"SELECT * FROM Reservations"
         )
 
-        reservations = cursor.fetchall()
-        connection.close()
+        rows = cursor.fetchall()
+        if rows is not None:
+            columns = [column[0] for column in cursor.description]
+            reservations = [dict(zip(columns, row)) for row in rows]
+            reservations = [Reservation.create_from_persistence(reservation) for reservation in reservations]
+        else:
+            reservations = []
 
         return reservations
 
     @staticmethod
-    def get_reservations_by_room_id(room_id: str):
+    def get_reservations_by_room_id(room_id: str) -> List[Reservation]:
         connection = get_conn()
         cursor = connection.cursor()
 
@@ -27,13 +34,18 @@ class ReservationRepository:
             f"SELECT * FROM Reservations WHERE room_id = '{room_id}'"
         )
 
-        reservations = cursor.fetchall()
-        connection.close()
+        rows = cursor.fetchall()
+        if rows is not None:
+            columns = [column[0] for column in cursor.description]
+            reservations = [dict(zip(columns, row)) for row in rows]
+            reservations = [Reservation.create_from_persistence(reservation) for reservation in reservations]
+        else:
+            reservations = []
 
         return reservations
 
     @staticmethod
-    def get_reservations_by_user_id(user_id: str):
+    def get_reservations_by_user_id(user_id: str) -> List[Reservation]:
         connection = get_conn()
         cursor = connection.cursor()
 
@@ -41,13 +53,18 @@ class ReservationRepository:
             f"SELECT * FROM Reservations WHERE id_usuario = '{user_id}'"
         )
 
-        reservations = cursor.fetchall()
-        connection.close()
+        rows = cursor.fetchall()
+        if rows is not None:
+            columns = [column[0] for column in cursor.description]
+            reservations = [dict(zip(columns, row)) for row in rows]
+            reservations = [Reservation.create_from_persistence(reservation) for reservation in reservations]
+        else:
+            reservations = []
 
         return reservations
 
     @staticmethod
-    def get_reservation_by_id(reservation_id: str):
+    def get_reservation_by_id(reservation_id: str) -> Reservation:
         connection = get_conn()
         cursor = connection.cursor()
 
@@ -55,29 +72,33 @@ class ReservationRepository:
             f"SELECT * FROM Reservations WHERE id = '{reservation_id}'"
         )
 
-        reservation = cursor.fetchone()
-        connection.close()
+        row = cursor.fetchone()
+        if row is not None:
+            columns = [column[0] for column in cursor.description]
+            reservation_dict = dict(zip(columns, row))
+
+            reservation = Reservation.create_from_persistence(reservation_dict)
+        else:
+            reservation = None
 
         return reservation
 
     @staticmethod
-    def create_reservation(reservation: Reservation):
+    def create_reservation(reservation: Reservation) -> None:
         connection = get_conn()
         cursor = connection.cursor()
 
         cursor.execute(
-            f"INSERT INTO Reservations (id, user_id, room_id, start_date, end_date, status, comments, updated_at) "
-            f"VALUES ('{reservation.id}', '{reservation.user_id}', '{reservation.room_id}', '{reservation.start_date}', "
-            f"'{reservation.end_date}', '{reservation.status}', '{reservation.comments}', '{reservation.updated_at}')"
+            f"INSERT INTO Reservations (id, user_id, room_id, start_date, end_date, status, comments, created_at, updated_at) "
+            f"VALUES ('{reservation.id}', '{reservation.user_id}', '{reservation.room_id}', CAST('{reservation.start_date}' AS DATETIME2), CAST('{reservation.end_date}' AS DATETIME2), "
+            f"'{reservation.status}', '{reservation.comments}', CAST('{reservation.created_at}' AS DATETIME2), CAST('{reservation.updated_at}' AS DATETIME2))"
         )
 
         connection.commit()
         connection.close()
 
-        return reservation
-
     @staticmethod
-    def delete_reservation(reservation_id: str):
+    def delete_reservation(reservation_id: str) -> None:
         connection = get_conn()
         cursor = connection.cursor()
 
@@ -89,17 +110,15 @@ class ReservationRepository:
         connection.close()
 
     @staticmethod
-    def update_reservation(reservation_id: str, reservation: Reservation):
+    def update_reservation(reservation_id: str, reservation: Reservation) -> None:
         connection = get_conn()
         cursor = connection.cursor()
 
         cursor.execute(
-            f"UPDATE Reservations SET id = '{reservation.id}', user_id = '{reservation.user_id}', room_id = '{reservation.room_id}', "
-            f"start_date = '{reservation.start_date}', end_date = '{reservation.end_date}', status = '{reservation.status}', "
-            f"comments = '{reservation.comments}', updated_at = '{reservation.updated_at}' WHERE id = '{reservation_id}'"
+            f"UPDATE Reservations SET user_id = '{reservation.user_id}', room_id = '{reservation.room_id}', start_date = CAST('{reservation.start_date}' AS DATETIME2), "
+            f"end_date = CAST('{reservation.end_date}' AS DATETIME2), status = '{reservation.status}', comments = '{reservation.comments}', updated_at = CAST('{reservation.updated_at}' AS DATETIME2) "
+            f"WHERE id = '{reservation_id}'"
         )
 
         connection.commit()
         connection.close()
-
-        return reservation

@@ -1,6 +1,4 @@
 import pyodbc
-import struct
-from azure import identity
 
 from app.core.config import Settings
 
@@ -10,8 +8,6 @@ config = Settings()
 def get_conn():
     try:
         connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
-        print('Connection established')
-
         return connection
     except Exception as e:
         print(e)

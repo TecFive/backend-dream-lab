@@ -1,16 +1,62 @@
-from fastapi import APIRouter, Depends
-from app.core.config import Settings
-from app.db.models.users.user import User
-from app.dependency import get_current_user
+from typing import List
 
+from fastapi import APIRouter, HTTPException
+from app.core.config import Settings
+from app.core.security import Security
+from app.dtos.users.create_user_dto import CreateUserDto
+from app.services.users.user_service import UserService
 
 config = Settings()
 
 router = APIRouter()
+userService = UserService()
 
 
 @router.post("/login")
-async def login_for_access_token(
-    current_user: User = Depends(get_current_user)
-):
-    pass
+async def login_for_access_token(password: str, email: str):
+    try:
+        if email is None or password is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Email or password are incorrect. Please try again.",
+            )
+
+        user = userService.find_user_by_email(email)
+        if user is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Email or password are incorrect. Please try again.",
+            )
+
+        if not Security.verify_password(password, user.password):
+            raise HTTPException(
+                status_code=400,
+                detail="Email or password are incorrect. Please try again.",
+            )
+
+        return {"token": Security.generate_jwt_token(user)}
+    except Exception as e:
+        raise e
+
+
+@router.post("/register")
+async def register_user(create_user_dto: CreateUserDto):
+    try:
+        user = userService.register_user(create_user_dto)
+
+        return user
+    except Exception as e:
+        raise e
+
+
+@router.post("/multi-register")
+async def register_multiple_users(create_user_dtos: List[CreateUserDto]):
+    try:
+        users = []
+        for create_user_dto in create_user_dtos:
+            user = userService.register_user(create_user_dto)
+            users.append(user)
+
+        return users
+    except Exception as e:
+        raise e
