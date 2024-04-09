@@ -11,18 +11,33 @@ reservationService = ReservationService()
 
 
 @router.get("/")
-async def get_all_reservations(current_user: User = Depends(get_current_user)):
-    pass
+async def get_all_reservations():
+    try:
+        reservations = reservationService.get_all_reservations()
+
+        return {"data": reservations}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @router.get("/my-reservations")
 async def get_my_reservations(current_user: User = Depends(get_current_user)):
-    pass
+    try:
+        reservations = reservationService.get_reservations_by_user_id(current_user.id)
+
+        return {"data": reservations}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @router.get("/{reservation_id}")
-async def find_reservation_by_id(reservation_id: int, current_user: User = Depends(get_current_user)):
-    pass
+async def find_reservation_by_id(reservation_id: str):
+    try:
+        reservation = reservationService.get_reservation_by_id(reservation_id)
+
+        return {"data": reservation}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @router.post("/")
