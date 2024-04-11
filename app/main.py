@@ -12,7 +12,6 @@ from app.dependency import has_jwt_access
 config = Settings()
 
 app = FastAPI()
-app = FastAPI(docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
