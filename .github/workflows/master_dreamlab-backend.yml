@@ -30,16 +30,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      - name: List Directory
-        run: ls
-      
+      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)      
       - name: Create .env file
         uses: varunkumar/create-env-action@v1
         with:
           env: 'AZURE_DATABASE_CONNECTION_STRING,AZURE_DATABASE_DRIVER,AZURE_DATABASE_NAME,AZURE_DATABASE_PASSWORD,AZURE_DATABASE_URL,AZURE_DATABASE_USER,JWT_ALGORITHM,JWT_EXPIRE_MINUTES,JWT_SECRET_KEY'
           file: .env
-          path: ../../../../../../../../backend-dream-lab/app
+          path: app
       
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
