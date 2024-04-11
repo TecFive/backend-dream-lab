@@ -6,3 +6,6 @@ azure-identity~=1.16.0b2
 pyodbc~=5.1.0
 bcrypt~=4.1.2
 bson~=0.5.10
+uvicorn
+gunicorn
+python-jose
