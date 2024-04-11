@@ -12,8 +12,7 @@ from app.dependency import has_jwt_access
 config = Settings()
 
 app = FastAPI()
-if os.getenv("ENVIRONMENT") != "dev":
-    app = FastAPI(docs_url=None, redoc_url=None)
+app = FastAPI(docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
