@@ -20,18 +20,18 @@ class Reservation(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(user_persistence) -> "Reservation":
-        reserved_equipment = user_persistence["reserved_equipment"].split(",") if isinstance(user_persistence["reserved_equipment"], str) else user_persistence["reserved_equipment"]
+    def create_from_persistence(reservation_persistence) -> "Reservation":
+        reserved_equipment = reservation_persistence["reserved_equipment"].split(",") if isinstance(reservation_persistence["reserved_equipment"], str) else reservation_persistence["reserved_equipment"]
 
         return Reservation(
-            id=user_persistence["id"],
-            user_id=user_persistence["user_id"],
-            room_id=user_persistence["room_id"],
-            start_date=user_persistence["start_date"],
-            end_date=user_persistence["end_date"],
+            id=reservation_persistence["id"],
+            user_id=reservation_persistence["user_id"],
+            room_id=reservation_persistence["room_id"],
+            start_date=reservation_persistence["start_date"],
+            end_date=reservation_persistence["end_date"],
             reserved_equipment=reserved_equipment,
-            status=user_persistence["status"],
-            comments=user_persistence["comments"],
-            created_at=user_persistence["created_at"],
-            updated_at=user_persistence["updated_at"],
+            status=reservation_persistence["status"],
+            comments=reservation_persistence["comments"],
+            created_at=reservation_persistence["created_at"],
+            updated_at=reservation_persistence["updated_at"],
         )

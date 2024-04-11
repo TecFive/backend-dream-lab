@@ -15,6 +15,6 @@ async def get_logged_user_info(
     current_user: User = Depends(get_current_user)
 ):
     try:
-        return current_user
+        return {"data": current_user}
     except Exception as e:
-        raise e
+        return {"error": str(e)}
