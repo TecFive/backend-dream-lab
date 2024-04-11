@@ -18,8 +18,8 @@ jobs:
       - name: Create .envs file
         uses: joseEnrique/create-envfile@0.0.1
         with:
+          working-directory: ../../app
           file_name: .env
-          directory: app
           fail_on_empty: True
           
       - uses: actions/checkout@v4
