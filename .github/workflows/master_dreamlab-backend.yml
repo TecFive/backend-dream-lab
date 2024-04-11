@@ -35,11 +35,12 @@ jobs:
         uses: joseEnrique/create-envfile@2445462ede0368720e84e564f89ff827a73935ac
         with:
           file_name: .env
+          directory: /home/runner/work
 
       - uses: actions/upload-artifact@v4
         with:
           name: env-artifact
-          path: /github/workspace/.env
+          path: /home/runner/work/.env
 
       - uses: actions/download-artifact@v4
         with:
