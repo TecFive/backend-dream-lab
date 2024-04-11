@@ -36,7 +36,6 @@ jobs:
         with:
           env: 'AZURE_DATABASE_CONNECTION_STRING,AZURE_DATABASE_DRIVER,AZURE_DATABASE_NAME,AZURE_DATABASE_PASSWORD,AZURE_DATABASE_URL,AZURE_DATABASE_USER,JWT_ALGORITHM,JWT_EXPIRE_MINUTES,JWT_SECRET_KEY'
           file: .env
-          path: ../../../../../backend-dream-lab/app
       
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
