@@ -31,12 +31,12 @@ jobs:
         run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      - name: Create .envs file
-        uses: joseEnrique/create-envfile@0.0.1
+      - name: Create .env file
+        uses: varunkumar/create-env-action@v1
         with:
-          entryPoint: ../../app
-          file_name: .env
-          fail_on_empty: True
+          env: 'AZURE_DATABASE_CONNECTION_STRING,AZURE_DATABASE_DRIVER,AZURE_DATABASE_NAME,AZURE_DATABASE_PASSWORD,AZURE_DATABASE_URL,AZURE_DATABASE_USER,JWT_ALGORITHM,JWT_EXPIRE_MINUTES,JWT_SECRET_KEY'
+          file: .env
+          path: ../../app
       
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
