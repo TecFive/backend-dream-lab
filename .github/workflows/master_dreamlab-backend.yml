@@ -27,9 +27,19 @@ jobs:
           python -m venv venv
           source venv/bin/activate
 
-      - name: Create .env file
-        uses: joseEnrique/create-envfile@2445462ede0368720e84e564f89ff827a73935ac
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
         with:
+          envkey_DEBUG: false
+          envkey_JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          envkey_JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
+          envkey_JWT_EXPIRE_MINUTES: ${{ secrets.JWT_EXPIRE_MINUTES }}
+          envkey_AZURE_DATABASE_CONNECTION_STRING: ${{ secrets.AZURE_DATABASE_CONNECTION_STRING }}
+          envkey_AZURE_DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL }}
+          envkey_AZURE_DATABASE_NAME: ${{ secrets.AZURE_DATABASE_NAME }}
+          envkey_AZURE_DATABASE_USER: ${{ secrets.AZURE_DATABASE_USER }}
+          envkey_AZURE_DATABASE_PASSWORD: ${{ secrets.AZURE_DATABASE_PASSWORD }}
+          envkey_AZURE_DATABASE_DRIVER: ${{ secrets.AZURE_DATABASE_DRIVER }}
           file_name: .env
 
       - uses: actions/upload-artifact@v4
