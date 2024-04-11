@@ -26,17 +26,17 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
+
+      - name: Create .env file
+        uses: joseEnrique/create-envfile@2445462ede0368720e84e564f89ff827a73935ac
+        with:
+          file_name: .env
+          directory: '${{ github.workspace }}'
       
       - name: Install dependencies
         run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)      
-      - name: Create .env file
-        uses: joseEnrique/create-envfile@2445462ede0368720e84e564f89ff827a73935ac
-        with:
-          file_name: .env
-          directory: /home/runner/work
-
       - uses: actions/upload-artifact@v4
         with:
           name: env-artifact
