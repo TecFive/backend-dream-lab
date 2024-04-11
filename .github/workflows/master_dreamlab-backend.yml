@@ -31,6 +31,13 @@ jobs:
         run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Create .envs file
+        uses: joseEnrique/create-envfile@0.0.1
+        with:
+          file_name: .env
+          directory: app
+          fail_on_empty: True
+          
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
