@@ -41,17 +41,7 @@ jobs:
           envkey_AZURE_DATABASE_PASSWORD: ${{ secrets.AZURE_DATABASE_PASSWORD }}
           envkey_AZURE_DATABASE_DRIVER: ${{ secrets.AZURE_DATABASE_DRIVER }}
           file_name: .env
-          directory: files
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: env-artifact
-          path: /.github/workspace/.env
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: env-artifact
-          path: /home/runner/work/backend-dream-lab/backend-dream-lab/app/.env
+          directory: app
       
       - name: Install dependencies
         run: pip install -r requirements.txt
