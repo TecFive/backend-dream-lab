@@ -41,6 +41,7 @@ jobs:
           envkey_AZURE_DATABASE_PASSWORD: ${{ secrets.AZURE_DATABASE_PASSWORD }}
           envkey_AZURE_DATABASE_DRIVER: ${{ secrets.AZURE_DATABASE_DRIVER }}
           file_name: .env
+          directory: files
 
       - uses: actions/upload-artifact@v4
         with:
