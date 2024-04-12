@@ -5,7 +5,6 @@ from app.core.config import Settings
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends
-import os
 
 from app.dependency import has_jwt_access
 

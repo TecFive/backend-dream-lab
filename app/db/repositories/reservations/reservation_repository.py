@@ -88,10 +88,11 @@ class ReservationRepository:
         connection = get_conn()
         cursor = connection.cursor()
 
+        normalized_reserved_equipment = ",".join(reservation.reserved_equipment)
         cursor.execute(
-            f"INSERT INTO Reservations (id, user_id, room_id, start_date, end_date, status, comments, created_at, updated_at) "
-            f"VALUES ('{reservation.id}', '{reservation.user_id}', '{reservation.room_id}', CAST('{reservation.start_date}' AS DATETIME2), CAST('{reservation.end_date}' AS DATETIME2), "
-            f"'{reservation.status}', '{reservation.comments}', CAST('{reservation.created_at}' AS DATETIME2), CAST('{reservation.updated_at}' AS DATETIME2))"
+            f"INSERT INTO Reservations (id, user_id, room_id, start_date, end_date, reserved_equipment, status, comments, created_at, updated_at) "
+            f"VALUES ('{reservation.id}', '{reservation.user_id}', '{reservation.room_id}', CAST('{reservation.start_date}' AS DATETIME2), "
+            f"CAST('{reservation.end_date}' AS DATETIME2), '{normalized_reserved_equipment}', '{reservation.status}', '{reservation.comments}', "
         )
 
         connection.commit()
@@ -110,14 +111,15 @@ class ReservationRepository:
         connection.close()
 
     @staticmethod
-    def update_reservation(reservation_id: str, reservation: Reservation) -> None:
+    def update_reservation(reservation: Reservation) -> None:
         connection = get_conn()
         cursor = connection.cursor()
 
+        normalized_reserved_equipment = ",".join(reservation.reserved_equipment)
         cursor.execute(
-            f"UPDATE Reservations SET user_id = '{reservation.user_id}', room_id = '{reservation.room_id}', start_date = CAST('{reservation.start_date}' AS DATETIME2), "
-            f"end_date = CAST('{reservation.end_date}' AS DATETIME2), status = '{reservation.status}', comments = '{reservation.comments}', updated_at = CAST('{reservation.updated_at}' AS DATETIME2) "
-            f"WHERE id = '{reservation_id}'"
+            f"UPDATE Reservations SET start_date = CAST('{reservation.start_date}' AS DATETIME2), end_date = CAST('{reservation.end_date}' AS DATETIME2), "
+            f"reserved_equipment = '{normalized_reserved_equipment}', status = '{reservation.status}', comments = '{reservation.comments}', "
+            f"updated_at = CAST('{str(reservation.updated_at)}' AS DATETIME2) WHERE id = '{reservation.id}'"
         )
 
         connection.commit()
