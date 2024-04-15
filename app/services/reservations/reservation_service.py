@@ -74,16 +74,25 @@ class ReservationService:
 
         self.reservation_repository.update_reservation(reservation_found)
 
-    def delete_reservation(self, reservation_id: str) -> None:
+    def cancel_reservation(self, reservation_id: str, user: User) -> None:
         reservation_found = self.reservation_repository.get_reservation_by_id(reservation_id)
         if not reservation_found:
             raise Exception("Reservation could not be found")
+
+        if reservation_found.user_id != user.id:
+            raise Exception("You are not allowed to delete this reservation")
 
         status_found = self.reservation_status_repository.find_reservation_status_by_id(reservation_found.status)
         if not status_found:
             raise Exception("Current reservation status could not be found")
 
-        if status_found.name == "CONFIRMED":
+        if status_found.name == "Approved":
             raise Exception("You are not allowed to delete a confirmed reservation")
 
-        self.reservation_repository.delete_reservation(reservation_id)
+        canceled_status = self.reservation_status_repository.find_reservation_status_by_name("Canceled")
+        if not canceled_status:
+            raise Exception("Canceled reservation status could not be found")
+
+        reservation_found.status = canceled_status.id
+
+        self.reservation_repository.update_reservation(reservation_found)

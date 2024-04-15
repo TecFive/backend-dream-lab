@@ -88,6 +88,14 @@ async def update_reservation(update_reservation_dto: UpdateReservationDto, curre
 @router.delete("/{reservation_id}")
 async def cancel_reservation(reservation_id: str, current_user: User = Depends(get_current_user)):
     try:
-        reservationService.delete_reservation(reservation_id, current_user)
+        reservationService.cancel_reservation(reservation_id, current_user)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@router.delete("/pending/{pending_reservation_id}")
+async def cancel_pending_reservation(pending_reservation_id: str, current_user: User = Depends(get_current_user)):
+    try:
+        pendingReservationService.cancel_pending_reservation(pending_reservation_id, current_user.id)
     except Exception as e:
         return {"error": str(e)}

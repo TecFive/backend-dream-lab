@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel
@@ -7,8 +8,8 @@ class ReservationStatus(BaseModel):
     id: str
     name: str
     description: str
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     def __init__(self, **data: Any):
         super().__init__(**data)

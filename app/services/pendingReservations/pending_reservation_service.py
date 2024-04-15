@@ -91,10 +91,12 @@ class PendingReservationService:
 
         return pending_reservation_found.id
 
-    def delete_pending_reservation(self, reservation_id: str) -> None:
-        pending_reservation_found = self.pending_reservation_repository.get_pending_reservation_by_id(reservation_id)
-
+    def cancel_pending_reservation(self, pending_reservation_id: str, user_id: str) -> None:
+        pending_reservation_found = self.pending_reservation_repository.get_pending_reservation_by_id(pending_reservation_id)
         if not pending_reservation_found:
             raise Exception("Pending reservation not found")
 
-        self.pending_reservation_repository.delete_pending_reservation(reservation_id)
+        if pending_reservation_found.user_id != user_id:
+            raise Exception("You are not allowed to delete this reservation")
+
+        self.pending_reservation_repository.delete_pending_reservation(pending_reservation_id)
