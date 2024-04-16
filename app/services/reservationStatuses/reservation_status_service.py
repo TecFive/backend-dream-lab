@@ -5,7 +5,7 @@ from app.db.repositories.reservationStatus.reservation_status_repositories impor
 
 
 class ReservationStatusService:
-    reservation_status_repository = ReservationStatusRepository
+    reservation_status_repository: ReservationStatusRepository
 
     def __init__(self):
         self.reservation_status_repository = ReservationStatusRepository()

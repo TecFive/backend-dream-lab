@@ -1,57 +1,20 @@
 from typing import List
 
-from app.db.client import get_conn
+from app.core.config import Settings
+from app.db.client import DatabaseClient
 from app.db.models.reservationStatus.reservationStatus import ReservationStatus
+
+config = Settings()
+database_client = DatabaseClient()
 
 
 class ReservationStatusRepository:
     @staticmethod
-    def find_reservation_status_by_id(reservation_status_id: str) -> ReservationStatus:
-        connection = get_conn()
-        cursor = connection.cursor()
-
-        cursor.execute(
-            f"SELECT * FROM ReservationStatus WHERE id = '{reservation_status_id}'"
-        )
-
-        row = cursor.fetchone()
-        if row is not None:
-            columns = [column[0] for column in cursor.description]
-            reservation_status_dict = dict(zip(columns, row))
-
-            reservation_status = ReservationStatus.create_from_persistence(reservation_status_dict)
-        else:
-            reservation_status = None
-
-        return reservation_status
-
-    @staticmethod
-    def find_reservation_status_by_name(reservation_status_name: str) -> ReservationStatus:
-        connection = get_conn()
-        cursor = connection.cursor()
-
-        cursor.execute(
-            f"SELECT * FROM ReservationStatus WHERE name = '{reservation_status_name.upper()}'"
-        )
-
-        row = cursor.fetchone()
-        if row is not None:
-            columns = [column[0] for column in cursor.description]
-            reservation_status_dict = dict(zip(columns, row))
-
-            reservation_status = ReservationStatus.create_from_persistence(reservation_status_dict)
-        else:
-            reservation_status = None
-
-        return reservation_status
-
-    @staticmethod
     def get_all_reservation_statuses() -> List[ReservationStatus]:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"SELECT * FROM ReservationStatus"
+            f"SELECT * FROM {config.ENVIRONMENT}.ReservationStatus"
         )
 
         rows = cursor.fetchall()
@@ -62,38 +25,81 @@ class ReservationStatusRepository:
         else:
             reservation_statuses = []
 
+        database_client.close_connection()
+
         return reservation_statuses
 
     @staticmethod
-    def create_reservation_status(reservation_status: ReservationStatus) -> None:
-        connection = get_conn()
-        cursor = connection.cursor()
+    def find_reservation_status_by_id(reservation_status_id: str) -> ReservationStatus:
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"INSERT INTO ReservationStatus (id, name, description, created_at, updated_at) VALUES ('{reservation_status.id}', '{reservation_status.name}', '{reservation_status.description}', CAST('{reservation_status.created_at}' AS DATETIME2), CAST('{reservation_status.updated_at}' AS DATETIME2))"
+            f"SELECT * FROM {config.ENVIRONMENT}.ReservationStatus WHERE id = '{reservation_status_id}'"
         )
 
-        connection.commit()
+        row = cursor.fetchone()
+        if row is not None:
+            columns = [column[0] for column in cursor.description]
+            reservation_status_dict = dict(zip(columns, row))
+
+            reservation_status = ReservationStatus.create_from_persistence(reservation_status_dict)
+        else:
+            reservation_status = None
+
+        database_client.close_connection()
+
+        return reservation_status
+
+    @staticmethod
+    def find_reservation_status_by_name(reservation_status_name: str) -> ReservationStatus:
+        cursor = database_client.get_conn()
+
+        cursor.execute(
+            f"SELECT * FROM {config.ENVIRONMENT}.ReservationStatus WHERE name = '{reservation_status_name.upper()}'"
+        )
+
+        row = cursor.fetchone()
+        if row is not None:
+            columns = [column[0] for column in cursor.description]
+            reservation_status_dict = dict(zip(columns, row))
+
+            reservation_status = ReservationStatus.create_from_persistence(reservation_status_dict)
+        else:
+            reservation_status = None
+
+        database_client.close_connection()
+
+        return reservation_status
+
+    @staticmethod
+    def create_reservation_status(reservation_status: ReservationStatus) -> None:
+        cursor = database_client.get_conn()
+
+        cursor.execute(
+            f"INSERT INTO {config.ENVIRONMENT}.ReservationStatus (id, name, description, created_at, updated_at) VALUES ('{reservation_status.id}', '{reservation_status.name}', '{reservation_status.description}', CAST('{reservation_status.created_at}' AS DATETIME2), CAST('{reservation_status.updated_at}' AS DATETIME2))"
+        )
+
+        database_client.commit()
+        database_client.close_connection()
 
     @staticmethod
     def update_reservation_status(reservation_status: ReservationStatus) -> None:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"UPDATE ReservationStatus SET name = '{reservation_status.name}', description = '{reservation_status.description}', updated_at = CAST('{reservation_status.updated_at}' AS DATETIME2) WHERE id = '{reservation_status.id}'"
+            f"UPDATE {config.ENVIRONMENT}.ReservationStatus SET name = '{reservation_status.name}', description = '{reservation_status.description}', updated_at = CAST('{reservation_status.updated_at}' AS DATETIME2) WHERE id = '{reservation_status.id}'"
         )
 
-        connection.commit()
+        database_client.commit()
+        database_client.close_connection()
 
     @staticmethod
     def delete_reservation_status(reservation_status_id: str) -> None:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"DELETE FROM ReservationStatus WHERE id = '{reservation_status_id}'"
+            f"DELETE FROM {config.ENVIRONMENT}.ReservationStatus WHERE id = '{reservation_status_id}'"
         )
 
-        connection.commit()
-        connection.close()
+        database_client.commit()
+        database_client.close_connection()
