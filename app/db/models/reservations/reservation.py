@@ -11,7 +11,7 @@ class Reservation(BaseModel):
     start_date: datetime
     end_date: datetime
     reserved_equipment: List[str]
-    status: int
+    status: str
     comments: str
     created_at: datetime
     updated_at: datetime

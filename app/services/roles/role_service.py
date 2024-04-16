@@ -11,7 +11,7 @@ from app.dtos.roles.update_role_dto import UpdateRoleDto
 
 
 class RoleService:
-    role_repository = RoleRepository
+    role_repository: RoleRepository
 
     def __init__(self):
         self.role_repository = RoleRepository()

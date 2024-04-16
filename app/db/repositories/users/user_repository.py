@@ -1,17 +1,20 @@
 from typing import List
 
-from app.db.client import get_conn
+from app.core.config import Settings
+from app.db.client import DatabaseClient
 from app.db.models.users.user import User
+
+config = Settings()
+database_client = DatabaseClient()
 
 
 class UserRepository:
     @staticmethod
     def get_all_users() -> List[User]:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"SELECT * FROM Users"
+            f"SELECT * FROM {config.ENVIRONMENT}.Users"
         )
 
         rows = cursor.fetchall()
@@ -22,17 +25,16 @@ class UserRepository:
         else:
             users = []
 
-        connection.close()
+        database_client.close_connection()
 
         return users
 
     @staticmethod
     def get_all_users_by_career(career: str) -> List[User]:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"SELECT * FROM Users WHERE career = '{career.upper()}'"
+            f"SELECT * FROM {config.ENVIRONMENT}.Users WHERE career = '{career.upper()}'"
         )
 
         rows = cursor.fetchall()
@@ -43,17 +45,16 @@ class UserRepository:
         else:
             users = []
 
-        connection.close()
+        database_client.close_connection()
 
         return users
 
     @staticmethod
     def get_all_users_by_semester(semester: int) -> List[User]:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"SELECT * FROM Users WHERE semester = {semester}"
+            f"SELECT * FROM {config.ENVIRONMENT}.Users WHERE semester = {semester}"
         )
 
         rows = cursor.fetchall()
@@ -64,17 +65,16 @@ class UserRepository:
         else:
             users = []
 
-        connection.close()
+        database_client.close_connection()
 
         return users
 
     @staticmethod
     def find_user_by_id(user_id: str) -> User:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"SELECT * FROM Users WHERE id = '{user_id}'"
+            f"SELECT * FROM {config.ENVIRONMENT}.Users WHERE id = '{user_id}'"
         )
 
         row = cursor.fetchone()
@@ -86,17 +86,16 @@ class UserRepository:
         else:
             user = None
 
-        connection.close()
+        database_client.close_connection()
 
         return user
 
     @staticmethod
     def find_user_by_email(email: str) -> User:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"SELECT * FROM Users WHERE email = '{email.upper()}'"
+            f"SELECT * FROM {config.ENVIRONMENT}.Users WHERE email = '{email.upper()}'"
         )
 
         row = cursor.fetchone()
@@ -108,42 +107,39 @@ class UserRepository:
         else:
             user = None
 
-        connection.close()
+        database_client.close_connection()
 
         return user
 
     @staticmethod
-    def register_user(user: User) -> None:
-        connection = get_conn()
-        cursor = connection.cursor()
+    def create_user(user: User) -> None:
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"INSERT INTO Users (id, name, email, password, career, semester, role, priority, created_at, updated_at) VALUES ('{user.id}', '{user.name.upper()}', '{user.email.upper()}', '{user.password}', '{user.career.upper()}', {user.semester}, '{user.role}', '{user.priority}', CAST('{str(user.created_at)}' AS DATETIME2), CAST('{str(user.updated_at)}' AS DATETIME2))"
+            f"INSERT INTO {config.ENVIRONMENT}.Users (id, name, email, password, career, semester, role, priority, created_at, updated_at) VALUES ('{user.id}', '{user.name.upper()}', '{user.email.upper()}', '{user.password}', '{user.career.upper()}', {user.semester}, '{user.role}', '{user.priority}', CAST('{str(user.created_at)}' AS DATETIME2), CAST('{str(user.updated_at)}' AS DATETIME2))"
         )
 
-        connection.commit()
-        connection.close()
+        database_client.commit()
+        database_client.close_connection()
 
     @staticmethod
     def update_user(user: User) -> None:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"UPDATE Users SET name = '{user.name.upper()}', email = '{user.email.upper()}', career = '{user.career.upper()}', semester = {user.semester}, role = '{user.role}', priority = '{user.priority}', updated_at = CAST('{str(user.updated_at)}' AS DATETIME2) WHERE id = '{user.id}'"
+            f"UPDATE {config.ENVIRONMENT}.Users SET name = '{user.name.upper()}', email = '{user.email.upper()}', career = '{user.career.upper()}', semester = {user.semester}, role = '{user.role}', priority = '{user.priority}', updated_at = CAST('{str(user.updated_at)}' AS DATETIME2) WHERE id = '{user.id}'"
         )
 
-        connection.commit()
-        connection.close()
+        database_client.commit()
+        database_client.close_connection()
 
     @staticmethod
     def delete_user(user_id: str) -> None:
-        connection = get_conn()
-        cursor = connection.cursor()
+        cursor = database_client.get_conn()
 
         cursor.execute(
-            f"DELETE FROM Users WHERE id = '{user_id}'"
+            f"DELETE FROM {config.ENVIRONMENT}.Users WHERE id = '{user_id}'"
         )
 
-        connection.commit()
-        connection.close()
+        database_client.commit()
+        database_client.close_connection()

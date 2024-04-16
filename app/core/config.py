@@ -18,6 +18,7 @@ load_dotenv(envFile)
 
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT")
     JWT_SECRET_KEY: str = os.getenv("SECRET_KEY")
     JWT_ALGORITHM: str = os.getenv("ALGORITHM")
     JWT_EXPIRE_MINUTES: int = os.getenv("JWT_EXPIRE_MINUTES")

@@ -3,6 +3,7 @@ from app.core.config import Settings
 from app.db.models.users.user import User
 from app.dependency import get_current_user
 from app.dtos.pendingReservations.create_pending_reservation_dto import CreatePendingReservationDto
+from app.dtos.pendingReservations.update_reservation_dto import UpdateReservationDto
 from app.dtos.reservations.create_reservation_dto import CreateReservationDto
 from app.services.pendingReservations.pending_reservation_service import PendingReservationService
 from app.services.reservations.reservation_service import ReservationService
@@ -47,7 +48,7 @@ async def find_reservation_by_id(reservation_id: str):
 @router.post("/")
 async def create_reservation(create_reservation_dto: CreateReservationDto, current_user: User = Depends(get_current_user)):
     try:
-        reservationService.create_reservation(create_reservation_dto)
+        reservationService.create_reservation(create_reservation_dto, current_user)
 
         return {"data": "Reservation created successfully"}
     except Exception as e:
@@ -74,11 +75,27 @@ async def pending_to_confirmed(pending_reservation_id: str):
         return {"error": str(e)}
 
 
-@router.put("/{reservation_id}")
-async def update_reservation(reservation_id: int, current_user: User = Depends(get_current_user)):
-    pass
+@router.put("/")
+async def update_reservation(update_reservation_dto: UpdateReservationDto, current_user: User = Depends(get_current_user)):
+    try:
+        reservationService.update_reservation(update_reservation_dto, current_user)
+
+        return {"data": "Reservation updated successfully"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @router.delete("/{reservation_id}")
-async def cancel_reservation(reservation_id: int, current_user: User = Depends(get_current_user)):
-    pass
+async def cancel_reservation(reservation_id: str, current_user: User = Depends(get_current_user)):
+    try:
+        reservationService.cancel_reservation(reservation_id, current_user)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@router.delete("/pending/{pending_reservation_id}")
+async def cancel_pending_reservation(pending_reservation_id: str, current_user: User = Depends(get_current_user)):
+    try:
+        pendingReservationService.cancel_pending_reservation(pending_reservation_id, current_user.id)
+    except Exception as e:
+        return {"error": str(e)}

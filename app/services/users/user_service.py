@@ -13,8 +13,8 @@ from app.dtos.users.update_user_dto import UpdateUserDto
 
 
 class UserService:
-    user_repository = UserRepository
-    role_repository = RoleRepository
+    user_repository: UserRepository
+    role_repository: RoleRepository
 
     def __init__(self):
         self.user_repository = UserRepository()
@@ -62,7 +62,7 @@ class UserService:
             updated_at=datetime.now().isoformat(),
         )
 
-        self.user_repository.register_user(user)
+        self.user_repository.create_user(user)
 
         return user
 

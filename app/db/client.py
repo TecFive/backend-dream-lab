@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pyodbc
 
 from app.core.config import Settings
@@ -5,61 +7,30 @@ from app.core.config import Settings
 config = Settings()
 
 
-def get_conn():
-    try:
-        connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
-        return connection
-    except Exception as e:
-        print(e)
-        print('Cannot connect to SQL server')
+class DatabaseClient:
+    connection: Optional[pyodbc.Connection]
 
+    def get_conn(self) -> pyodbc.Cursor:
+        try:
+            self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
+            cursor = self.connection.cursor()
+            return cursor
+        except Exception as e:
+            print(e)
+            print('Cannot connect to SQL server')
+            self.close_connection()
 
-def execute_query(query):
-    conn = get_conn()
-    cursor = conn.cursor()
-    cursor.execute(query)
-    conn.commit()
-    conn.close()
+    def commit(self) -> None:
+        try:
+            self.connection.commit()
+        except Exception as e:
+            print(e)
+            print('Cannot commit changes to SQL server')
+            self.close_connection()
 
-
-def fetch_query(query):
-    conn = get_conn()
-    cursor = conn.cursor()
-    cursor.execute(query)
-    result = cursor.fetchall()
-    conn.close()
-    return result
-
-
-def fetch_query_with_params(query, params):
-    conn = get_conn()
-    cursor = conn.cursor()
-    cursor.execute(query, params)
-    result = cursor.fetchall()
-    conn.close()
-    return result
-
-
-def execute_query_with_params(query, params):
-    conn = get_conn()
-    cursor = conn.cursor()
-    cursor.execute(query, params)
-    conn.commit()
-    conn.close()
-
-
-def fetch_query_with_params_dict(query, params):
-    conn = get_conn()
-    cursor = conn.cursor()
-    cursor.execute(query, params)
-    result = cursor.fetchall()
-    conn.close()
-    return result
-
-
-def execute_query_with_params_dict(query, params):
-    conn = get_conn()
-    cursor = conn.cursor()
-    cursor.execute(query, params)
-    conn.commit()
-    conn.close()
+    def close_connection(self) -> None:
+        try:
+            self.connection.close()
+        except Exception as e:
+            print(e)
+            print('Cannot close connection to SQL server')
