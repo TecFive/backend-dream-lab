@@ -3,6 +3,7 @@ from typing import List
 from app.core.config import Settings
 from app.db.client import database_client
 from app.db.models.reservations.reservation import Reservation
+from app.dtos.reservations.get_my_reservations_dto import GetMyReservationsDto
 
 config = Settings()
 
@@ -54,19 +55,25 @@ class ReservationRepository:
             raise e
 
     @staticmethod
-    def get_reservations_by_user_id(user_id: str) -> List[Reservation]:
+    def get_reservations_by_user_id(user_id: str) -> List[GetMyReservationsDto]:
         try:
             cursor = database_client.get_conn()
 
-            cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Reservations WHERE id_usuario = '{user_id}'"
-            )
+            query = f"""
+                select [{config.ENVIRONMENT}].[Reservations].[id], [{config.ENVIRONMENT}].[Rooms].[name], [{config.ENVIRONMENT}].[Reservations].[start_date], [{config.ENVIRONMENT}].[Reservations].[end_date], [{config.ENVIRONMENT}].[Reservations].[reserved_equipment] 
+                from [{config.ENVIRONMENT}].[Reservations] 
+                inner join [{config.ENVIRONMENT}].[Rooms] on [{config.ENVIRONMENT}].[Reservations].[room_id] = [{config.ENVIRONMENT}].[Rooms].[id]
+                where user_id = '{user_id}'
+                order by [{config.ENVIRONMENT}].[Reservations].[start_date]
+            """
+
+            cursor.execute(query)
 
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
                 reservations = [dict(zip(columns, row)) for row in rows]
-                reservations = [Reservation.create_from_persistence(reservation) for reservation in reservations]
+                reservations = [GetMyReservationsDto.create_from_persistence(reservation) for reservation in reservations]
             else:
                 reservations = []
 

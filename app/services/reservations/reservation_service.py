@@ -12,6 +12,7 @@ from app.db.repositories.reservationStatus.reservation_status_repositories impor
 from app.db.repositories.reservations.reservation_repository import ReservationRepository
 from app.dtos.pendingReservations.update_reservation_dto import UpdateReservationDto
 from app.dtos.reservations.create_reservation_dto import CreateReservationDto
+from app.dtos.reservations.get_my_reservations_dto import GetMyReservationsDto
 
 
 class ReservationService:
@@ -38,7 +39,7 @@ class ReservationService:
 
         return reservations
 
-    def get_reservations_by_user_id(self, user_id: str) -> List[Reservation]:
+    def get_reservations_by_user_id(self, user_id: str) -> List[GetMyReservationsDto]:
         reservations = self.reservation_repository.get_reservations_by_user_id(user_id)
         database_client.close_connection()
 
