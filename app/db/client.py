@@ -34,3 +34,6 @@ class DatabaseClient:
         except Exception as e:
             print(e)
             print('Cannot close connection to SQL server')
+
+
+database_client = DatabaseClient()

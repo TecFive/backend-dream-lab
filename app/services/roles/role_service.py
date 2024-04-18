@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+from app.db.client import database_client
 from app.db.models.roles.role import Role
 from app.db.repositories.roles.role_repository import RoleRepository
 from app.dtos.roles.create_role_dto import CreateRoleDto
@@ -18,16 +19,19 @@ class RoleService:
 
     def get_all_roles(self) -> List[Role]:
         roles = self.role_repository.get_all_roles()
+        database_client.close_connection()
 
         return roles
 
     def find_role_by_id(self, role_id: str) -> Role:
         role = self.role_repository.find_role_by_id(role_id)
+        database_client.close_connection()
 
         return role
 
     def find_role_by_name(self, role_name: str) -> Role:
         role = self.role_repository.find_role_by_name(role_name)
+        database_client.close_connection()
 
         return role
 
@@ -44,6 +48,9 @@ class RoleService:
 
         self.role_repository.create_role(new_role)
 
+        database_client.commit()
+        database_client.close_connection()
+
     def update_role(self, role: UpdateRoleDto) -> None:
         role_found = self.role_repository.find_role_by_id(role.id)
 
@@ -58,6 +65,9 @@ class RoleService:
 
         self.role_repository.update_role(role_found)
 
+        database_client.commit()
+        database_client.close_connection()
+
     def delete_role(self, role_id: str) -> None:
         role_found = self.role_repository.find_role_by_id(role_id)
 
@@ -65,3 +75,6 @@ class RoleService:
             raise Exception("Role not found.")
 
         self.role_repository.delete_role(role_id)
+
+        database_client.commit()
+        database_client.close_connection()

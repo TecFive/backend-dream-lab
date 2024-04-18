@@ -2,114 +2,113 @@ from typing import List
 
 from app.core.config import Settings
 from app.db.client import DatabaseClient
-from app.db.models.roles.role import Role
+from app.db.models.rooms.room import Room
 
 config = Settings()
 database_client = DatabaseClient()
 
 
-class RoleRepository:
+class RoomRepository:
     @staticmethod
-    def get_all_roles() -> List[Role]:
+    def get_all_rooms() -> List[Room]:
         try:
             cursor = database_client.get_conn()
 
             cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Roles"
+                f"SELECT * FROM {config.ENVIRONMENT}.Rooms"
             )
 
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
-                roles = [dict(zip(columns, row)) for row in rows]
-                roles = [Role.create_from_persistence(role) for role in roles]
+                rooms = [Room.create_from_persistence(dict(zip(columns, row))) for row in rows]
             else:
-                roles = []
+                rooms = []
 
-            return roles
+            return rooms
         except Exception as e:
             database_client.close_connection()
             raise e
 
     @staticmethod
-    def find_role_by_id(role_id: str) -> Role:
+    def find_room_by_id(room_id: str) -> Room:
         try:
             cursor = database_client.get_conn()
 
             cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Roles WHERE id = '{role_id}'"
+                f"SELECT * FROM {config.ENVIRONMENT}.Rooms WHERE id = '{room_id}'"
             )
 
             row = cursor.fetchone()
             if row is not None:
                 columns = [column[0] for column in cursor.description]
-                role_dict = dict(zip(columns, row))
+                room_dict = dict(zip(columns, row))
 
-                role = Role.create_from_persistence(role_dict)
+                room = Room.create_from_persistence(room_dict)
             else:
-                role = None
+                room = None
 
-            return role
+            return room
         except Exception as e:
             database_client.close_connection()
             raise e
 
     @staticmethod
-    def find_role_by_name(role_name: str) -> Role:
+    def find_room_by_name(room_name: str) -> Room:
         try:
             cursor = database_client.get_conn()
 
             cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Roles WHERE name = '{role_name.upper()}'"
+                f"SELECT * FROM {config.ENVIRONMENT}.Rooms WHERE name = '{room_name}'"
             )
 
             row = cursor.fetchone()
             if row is not None:
                 columns = [column[0] for column in cursor.description]
-                role_dict = dict(zip(columns, row))
+                room_dict = dict(zip(columns, row))
 
-                role = Role.create_from_persistence(role_dict)
+                room = Room.create_from_persistence(room_dict)
             else:
-                role = None
+                room = None
 
-            return role
+            return room
         except Exception as e:
             database_client.close_connection()
             raise e
 
     @staticmethod
-    def create_role(role: Role) -> None:
+    def create_room(room: Room) -> None:
         try:
             cursor = database_client.get_conn()
 
-            normalized_permissions = ",".join(role.permissions)
+            normalized_room_equipment = ",".join(room.room_equipment)
             cursor.execute(
-                f"INSERT INTO {config.ENVIRONMENT}.Roles (id, name, description, permissions, priority, created_at, updated_at) VALUES ('{role.id}', '{role.name.upper()}', '{role.description}', '{normalized_permissions}', '{role.priority}', CAST('{role.created_at}' AS DATETIME2), CAST('{role.updated_at}' AS DATETIME2))"
+                f"INSERT INTO {config.ENVIRONMENT}.Rooms (id, name, description, capacity, room_equipment, created_at, updated_at) VALUES ('{room.id}', '{room.name}', '{room.description}', {room.capacity}, '{normalized_room_equipment}', CAST('{room.created_at}' AS DATETIME2), CAST('{room.updated_at}' AS DATETIME2))"
             )
         except Exception as e:
             database_client.close_connection()
             raise e
 
     @staticmethod
-    def update_role(role: Role) -> None:
+    def update_room(room: Room) -> None:
         try:
             cursor = database_client.get_conn()
 
-            normalized_permissions = ",".join(role.permissions)
+            normalized_room_equipment = ",".join(room.room_equipment)
             cursor.execute(
-                f"UPDATE {config.ENVIRONMENT}.Roles SET name = '{role.name.upper()}', description = '{role.description}', permissions = '{normalized_permissions}', priority = '{role.priority}', updated_at = CAST('{role.updated_at}' AS DATETIME2) WHERE id = '{role.id}'"
+                f"UPDATE {config.ENVIRONMENT}.Rooms SET name = '{room.name}', description = '{room.description}', capacity = {room.capacity}, room_equipment = '{normalized_room_equipment}', updated_at = CAST('{room.updated_at}' AS DATETIME2) WHERE id = '{room.id}'"
             )
         except Exception as e:
             database_client.close_connection()
             raise e
 
     @staticmethod
-    def delete_role(role_id: str) -> None:
+    def delete_room(room_id: str) -> None:
         try:
             cursor = database_client.get_conn()
 
             cursor.execute(
-                f"DELETE FROM {config.ENVIRONMENT}.Roles WHERE id = '{role_id}'"
+                f"DELETE FROM {config.ENVIRONMENT}.Rooms WHERE id = '{room_id}'"
             )
         except Exception as e:
             database_client.close_connection()

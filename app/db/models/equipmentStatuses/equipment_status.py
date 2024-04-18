@@ -8,8 +8,8 @@ class EquipmentStatus(BaseModel):
     id: str
     name: str
     description: str
-    createdAt: datetime
-    updatedAt: datetime
+    created_at: datetime
+    updated_at: datetime
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -20,6 +20,6 @@ class EquipmentStatus(BaseModel):
             id=equipment_status_persistence["id"],
             name=equipment_status_persistence["name"],
             description=equipment_status_persistence["description"],
-            createdAt=equipment_status_persistence["createdAt"],
-            updatedAt=equipment_status_persistence["updatedAt"],
+            created_at=equipment_status_persistence["created_at"],
+            updated_at=equipment_status_persistence["updated_at"],
         )

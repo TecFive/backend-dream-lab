@@ -3,6 +3,7 @@ from typing import List
 
 import bson
 
+from app.db.client import database_client
 from app.db.models.reservations.reservation import Reservation
 from app.db.models.users.user import User
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
@@ -27,21 +28,25 @@ class ReservationService:
 
     def get_all_reservations(self) -> List[Reservation]:
         reservations = self.reservation_repository.get_all_reservations()
+        database_client.close_connection()
 
         return reservations
 
     def get_reservations_by_room_id(self, room_id: str) -> List[Reservation]:
         reservations = self.reservation_repository.get_reservations_by_room_id(room_id)
+        database_client.close_connection()
 
         return reservations
 
     def get_reservations_by_user_id(self, user_id: str) -> List[Reservation]:
         reservations = self.reservation_repository.get_reservations_by_user_id(user_id)
+        database_client.close_connection()
 
         return reservations
 
     def get_reservation_by_id(self, reservation_id: str) -> Reservation:
         reservation = self.reservation_repository.find_reservation_by_id(reservation_id)
+        database_client.close_connection()
 
         return reservation
 
@@ -67,6 +72,8 @@ class ReservationService:
                 raise Exception("Equipment is not available")
 
             equipment_found.status = in_use_equipment_status_found.id
+            equipment_found.updated_at = datetime.now().isoformat()
+
             self.equipment_repository.update_equipment(equipment_found)
 
         new_reservation = Reservation(
@@ -84,6 +91,9 @@ class ReservationService:
 
         self.reservation_repository.create_reservation(new_reservation)
 
+        database_client.commit()
+        database_client.close_connection()
+
     def update_reservation(self, update_reservation_dto: UpdateReservationDto, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(update_reservation_dto.reservation_id)
         if not reservation_found:
@@ -96,8 +106,12 @@ class ReservationService:
         reservation_found.end_date = update_reservation_dto.end_date
         reservation_found.reserved_equipment = update_reservation_dto.reserved_equipment
         reservation_found.comments = update_reservation_dto.comments
+        reservation_found.updated_at = datetime.now().isoformat()
 
         self.reservation_repository.update_reservation(reservation_found)
+
+        database_client.commit()
+        database_client.close_connection()
 
     def cancel_reservation(self, reservation_id: str, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(reservation_id)
@@ -121,3 +135,6 @@ class ReservationService:
         reservation_found.status = canceled_status.id
 
         self.reservation_repository.update_reservation(reservation_found)
+
+        database_client.commit()
+        database_client.close_connection()

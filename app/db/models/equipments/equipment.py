@@ -9,9 +9,9 @@ class Equipment(BaseModel):
     name: str
     description: str
     status: str
-    reservationId: Optional[str]
-    createdAt: datetime
-    updatedAt: datetime
+    reservation_id: Optional[str]
+    created_at: datetime
+    updated_at: datetime
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -23,7 +23,7 @@ class Equipment(BaseModel):
             name=equipment_persistence["name"],
             description=equipment_persistence["description"],
             status=equipment_persistence["status"],
-            reservationId=equipment_persistence["reservationId"],
-            createdAt=equipment_persistence["createdAt"],
-            updatedAt=equipment_persistence["updatedAt"],
+            reservation_id=equipment_persistence["reservation_id"],
+            created_at=equipment_persistence["created_at"],
+            updated_at=equipment_persistence["updated_at"],
         )
