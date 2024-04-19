@@ -10,9 +10,11 @@ from app.db.repositories.equipmentStatuses.equipment_status_repository import Eq
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
 from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
 from app.db.repositories.reservations.reservation_repository import ReservationRepository
+from app.db.repositories.rooms.room_repository import RoomRepository
 from app.dtos.pendingReservations.update_reservation_dto import UpdateReservationDto
 from app.dtos.reservations.create_reservation_dto import CreateReservationDto
 from app.dtos.reservations.get_my_reservations_dto import GetMyReservationsDto
+from app.dtos.reservations.reservation_equipment_detail_dto import ReservationEquipmentDetailDto
 
 
 class ReservationService:
@@ -20,12 +22,14 @@ class ReservationService:
     reservation_status_repository: ReservationStatusRepository
     equipment_status_repository: EquipmentStatusRepository
     equipment_repository: EquipmentRepository
+    room_repository: RoomRepository
 
     def __init__(self):
         self.reservation_repository = ReservationRepository()
         self.reservation_status_repository = ReservationStatusRepository()
         self.equipment_status_repository = EquipmentStatusRepository()
         self.equipment_repository = EquipmentRepository()
+        self.room_repository = RoomRepository()
 
     def get_all_reservations(self) -> List[Reservation]:
         reservations = self.reservation_repository.get_all_reservations()
@@ -43,7 +47,27 @@ class ReservationService:
         reservations = self.reservation_repository.get_reservations_by_user_id(user_id)
         database_client.close_connection()
 
-        return reservations
+        reservations_dto = []
+        for reservation in reservations:
+            equipment_dto = []
+            for equipment in reservation.reserved_equipment:
+                data = self.equipment_repository.find_equipment_by_id(equipment)
+                equipment_dto.append(ReservationEquipmentDetailDto(
+                    id=data.id,
+                    name=data.name
+                ))
+
+            room_data = self.room_repository.find_room_by_id(reservation.room_id)
+
+            reservations_dto.append(GetMyReservationsDto(
+                id=reservation.id,
+                name=room_data.name,
+                start_date=reservation.start_date,
+                end_date=reservation.end_date,
+                reserved_equipment=equipment_dto
+            ))
+
+        return reservations_dto
 
     def get_reservation_by_id(self, reservation_id: str) -> Reservation:
         reservation = self.reservation_repository.find_reservation_by_id(reservation_id)

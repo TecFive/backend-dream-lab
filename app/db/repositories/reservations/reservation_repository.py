@@ -55,25 +55,17 @@ class ReservationRepository:
             raise e
 
     @staticmethod
-    def get_reservations_by_user_id(user_id: str) -> List[GetMyReservationsDto]:
+    def get_reservations_by_user_id(user_id: str) -> List[Reservation]:
         try:
             cursor = database_client.get_conn()
 
-            query = f"""
-                select [{config.ENVIRONMENT}].[Reservations].[id], [{config.ENVIRONMENT}].[Rooms].[name], [{config.ENVIRONMENT}].[Reservations].[start_date], [{config.ENVIRONMENT}].[Reservations].[end_date], [{config.ENVIRONMENT}].[Reservations].[reserved_equipment] 
-                from [{config.ENVIRONMENT}].[Reservations] 
-                inner join [{config.ENVIRONMENT}].[Rooms] on [{config.ENVIRONMENT}].[Reservations].[room_id] = [{config.ENVIRONMENT}].[Rooms].[id]
-                where user_id = '{user_id}'
-                order by [{config.ENVIRONMENT}].[Reservations].[start_date]
-            """
-
-            cursor.execute(query)
+            cursor.execute(f"SELECT * FROM {config.ENVIRONMENT}.Reservations WHERE user_id = '{user_id}'")
 
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
                 reservations = [dict(zip(columns, row)) for row in rows]
-                reservations = [GetMyReservationsDto.create_from_persistence(reservation) for reservation in reservations]
+                reservations = [Reservation.create_from_persistence(reservation) for reservation in reservations]
             else:
                 reservations = []
 
