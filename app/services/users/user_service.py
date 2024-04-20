@@ -43,11 +43,17 @@ class UserService:
         user = self.user_repository.find_user_by_id(user_id)
         database_client.close_connection()
 
+        role_found = self.role_repository.find_role_by_id(user.role)
+        user.role = role_found.name
+
         return user
 
     def find_user_by_email(self, email: str) -> User:
         user = self.user_repository.find_user_by_email(email)
         database_client.close_connection()
+
+        role_found = self.role_repository.find_role_by_id(user.role)
+        user.role = role_found.name
 
         return user
 
