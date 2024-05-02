@@ -75,6 +75,12 @@ class ReservationService:
 
         return reservation
 
+    def get_available_hours(self, date: str) -> List[str]:
+        available_hours = self.reservation_repository.get_available_hours(date)
+        database_client.close_connection()
+
+        return available_hours
+
     def create_reservation(self, reservation: CreateReservationDto, user: User) -> None:
         status_found = self.reservation_status_repository.find_reservation_status_by_id(reservation.status)
         if not status_found:

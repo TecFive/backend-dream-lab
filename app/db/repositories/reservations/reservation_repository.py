@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from app.core.config import Settings
@@ -93,6 +94,33 @@ class ReservationRepository:
                 reservation = None
 
             return reservation
+        except Exception as e:
+            database_client.close_connection()
+            raise e
+
+    @staticmethod
+    def get_available_hours(date: str) -> List[datetime]:
+        try:
+            cursor = database_client.get_conn()
+
+            cursor.execute(
+                f"SELECT * FROM {config.ENVIRONMENT}.Reservations WHERE start_date >= '{date} 00:00:00' AND end_date <= '{date} 23:59:59'"
+            )
+
+            rows = cursor.fetchall()
+            if rows is not None:
+                columns = [column[0] for column in cursor.description]
+                reservations = [dict(zip(columns, row)) for row in rows]
+                reservations = [Reservation.create_from_persistence(reservation) for reservation in reservations]
+            else:
+                reservations = []
+
+            available_hours = []
+            for reservation in reservations:
+                available_hours.append(reservation.start_date)
+                available_hours.append(reservation.end_date)
+
+            return available_hours
         except Exception as e:
             database_client.close_connection()
             raise e

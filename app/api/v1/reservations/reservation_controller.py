@@ -35,6 +35,16 @@ async def get_my_reservations(current_user: User = Depends(get_current_user)):
         return {"error": str(e)}
 
 
+@router.get("/available/hours/{date}")
+async def get_available_hours(date: str):
+    try:
+        available_hours = reservationService.get_available_hours(date)
+
+        return {"data": available_hours}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @router.get("/{reservation_id}")
 async def find_reservation_by_id(reservation_id: str):
     try:
