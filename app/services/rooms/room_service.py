@@ -7,6 +7,7 @@ import bson
 from app.db.models.rooms.room import Room
 from app.db.repositories.rooms.room_repository import RoomRepository
 from app.dtos.rooms.create_room_dto import CreateRoomDto
+from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto
 from app.dtos.rooms.update_room_dto import UpdateRoomDto
 
 
@@ -16,7 +17,7 @@ class RoomService:
     def __init__(self):
         self.room_repository = RoomRepository()
 
-    def get_all_rooms(self) -> List[Room]:
+    def get_all_rooms(self) -> List[GetAllRoomsDto]:
         rooms = self.room_repository.get_all_rooms()
 
         return rooms

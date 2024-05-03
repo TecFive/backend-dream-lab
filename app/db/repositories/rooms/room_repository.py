@@ -4,6 +4,7 @@ from typing import List
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.rooms.room import Room
+from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto
 
 config = Settings()
 
@@ -11,7 +12,7 @@ config = Settings()
 class RoomRepository:
     database_client: DatabaseClient = DatabaseClient()
 
-    def get_all_rooms(self) -> List[Room]:
+    def get_all_rooms(self) -> List[GetAllRoomsDto]:
         try:
             cursor = self.database_client.get_conn()
 
@@ -19,6 +20,7 @@ class RoomRepository:
                 f"SELECT * FROM {config.ENVIRONMENT}.Rooms"
             )
 
+            rooms_dto = []
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
@@ -26,9 +28,48 @@ class RoomRepository:
             else:
                 rooms = []
 
+            for room in rooms:
+                room_equipment = []
+                for equipment in room.room_equipment:
+                    cursor.execute(
+                        f"SELECT * FROM {config.ENVIRONMENT}.Equipment WHERE id = '{equipment}'"
+                    )
+                    row = cursor.fetchone()
+                    if row is not None:
+                        columns = [column[0] for column in cursor.description]
+                        equipment_dict = dict(zip(columns, row))
+
+                        room_equipment.append(equipment_dict)
+
+                room_equipment_dto = []
+                for equipment in room_equipment:
+                    equipment_dto = {
+                        "id": equipment["id"],
+                        "name": equipment["name"],
+                        "description": equipment["description"],
+                        "status": equipment["status"],
+                        "reservation_id": equipment["reservation_id"],
+                        "image": equipment["image"],
+                        "created_at": equipment["created_at"],
+                        "updated_at": equipment["updated_at"]
+                    }
+                    room_equipment_dto.append(equipment_dto)
+
+                room_dto = GetAllRoomsDto(
+                    id=room.id,
+                    name=room.name,
+                    description=room.description,
+                    capacity=room.capacity,
+                    room_equipment=room_equipment_dto,
+                    image=room.image,
+                    created_at=room.created_at,
+                    updated_at=room.updated_at
+                )
+                rooms_dto.append(room_dto)
+
             self.database_client.close()
 
-            return rooms
+            return rooms_dto
         except Exception as e:
             raise e
 

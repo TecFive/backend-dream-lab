@@ -46,12 +46,14 @@ class ReservationService:
         reservations_dto = []
         for reservation in reservations:
             equipment_dto = []
-            for equipment in reservation.reserved_equipment:
-                data = self.equipment_repository.find_equipment_by_id(equipment)
-                equipment_dto.append(ReservationEquipmentDetailDto(
-                    id=data.id,
-                    name=data.name
-                ))
+
+            if len(reservation.reserved_equipment[0]) != 0:
+                for equipment in reservation.reserved_equipment:
+                    data = self.equipment_repository.find_equipment_by_id(equipment)
+                    equipment_dto.append(ReservationEquipmentDetailDto(
+                        id=data.id,
+                        name=data.name
+                    ))
 
             room_data = self.room_repository.find_room_by_id(reservation.room_id)
             status_data = self.reservation_status_repository.find_reservation_status_by_id(reservation.status)
@@ -59,6 +61,7 @@ class ReservationService:
             reservations_dto.append(GetMyReservationsDto(
                 id=reservation.id,
                 name=room_data.name,
+                room_image=room_data.image,
                 status=status_data.name,
                 start_date=reservation.start_date,
                 end_date=reservation.end_date,
