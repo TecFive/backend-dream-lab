@@ -10,6 +10,7 @@ class Equipment(BaseModel):
     description: str
     status: str
     reservation_id: Optional[str]
+    image: Optional[str]
     created_at: datetime
     updated_at: datetime
 
@@ -24,6 +25,7 @@ class Equipment(BaseModel):
             description=equipment_persistence["description"],
             status=equipment_persistence["status"],
             reservation_id=equipment_persistence["reservation_id"],
+            image=equipment_persistence["image"],
             created_at=equipment_persistence["created_at"],
             updated_at=equipment_persistence["updated_at"],
         )

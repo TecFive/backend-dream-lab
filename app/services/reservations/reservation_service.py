@@ -11,10 +11,10 @@ from app.db.repositories.equipments.equipment_repository import EquipmentReposit
 from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
 from app.db.repositories.reservations.reservation_repository import ReservationRepository
 from app.db.repositories.rooms.room_repository import RoomRepository
-from app.dtos.pendingReservations.update_reservation_dto import UpdateReservationDto
 from app.dtos.reservations.create_reservation_dto import CreateReservationDto
 from app.dtos.reservations.get_my_reservations_dto import GetMyReservationsDto
 from app.dtos.reservations.reservation_equipment_detail_dto import ReservationEquipmentDetailDto
+from app.dtos.reservations.update_reservation_dto import UpdateReservationDto
 
 
 class ReservationService:
@@ -33,19 +33,16 @@ class ReservationService:
 
     def get_all_reservations(self) -> List[Reservation]:
         reservations = self.reservation_repository.get_all_reservations()
-        database_client.close_connection()
 
         return reservations
 
     def get_reservations_by_room_id(self, room_id: str) -> List[Reservation]:
         reservations = self.reservation_repository.get_reservations_by_room_id(room_id)
-        database_client.close_connection()
 
         return reservations
 
     def get_reservations_by_user_id(self, user_id: str) -> List[GetMyReservationsDto]:
         reservations = self.reservation_repository.get_reservations_by_user_id(user_id)
-        database_client.close_connection()
 
         reservations_dto = []
         for reservation in reservations:
@@ -58,10 +55,12 @@ class ReservationService:
                 ))
 
             room_data = self.room_repository.find_room_by_id(reservation.room_id)
+            status_data = self.reservation_status_repository.find_reservation_status_by_id(reservation.status)
 
             reservations_dto.append(GetMyReservationsDto(
                 id=reservation.id,
                 name=room_data.name,
+                status=status_data.name,
                 start_date=reservation.start_date,
                 end_date=reservation.end_date,
                 reserved_equipment=equipment_dto
@@ -71,18 +70,16 @@ class ReservationService:
 
     def get_reservation_by_id(self, reservation_id: str) -> Reservation:
         reservation = self.reservation_repository.find_reservation_by_id(reservation_id)
-        database_client.close_connection()
 
         return reservation
 
-    def get_available_hours(self, date: str) -> List[str]:
+    def get_available_hours(self, date: str) -> List[datetime]:
         available_hours = self.reservation_repository.get_available_hours(date)
-        database_client.close_connection()
 
         return available_hours
 
     def create_reservation(self, reservation: CreateReservationDto, user: User) -> None:
-        status_found = self.reservation_status_repository.find_reservation_status_by_id(reservation.status)
+        status_found = self.reservation_status_repository.find_reservation_status_by_name("Pending")
         if not status_found:
             raise Exception("Reservation status could not be found")
 
@@ -123,7 +120,6 @@ class ReservationService:
         self.reservation_repository.create_reservation(new_reservation)
 
         database_client.commit()
-        database_client.close_connection()
 
     def update_reservation(self, update_reservation_dto: UpdateReservationDto, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(update_reservation_dto.reservation_id)
@@ -142,7 +138,6 @@ class ReservationService:
         self.reservation_repository.update_reservation(reservation_found)
 
         database_client.commit()
-        database_client.close_connection()
 
     def cancel_reservation(self, reservation_id: str, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(reservation_id)
@@ -156,16 +151,12 @@ class ReservationService:
         if not status_found:
             raise Exception("Current reservation status could not be found")
 
-        if status_found.name == "Approved":
-            raise Exception("You are not allowed to delete a confirmed reservation")
-
-        canceled_status = self.reservation_status_repository.find_reservation_status_by_name("Canceled")
-        if not canceled_status:
+        cancelled_status = self.reservation_status_repository.find_reservation_status_by_name("Cancelled")
+        if not cancelled_status:
             raise Exception("Canceled reservation status could not be found")
 
-        reservation_found.status = canceled_status.id
+        reservation_found.status = cancelled_status.id
 
         self.reservation_repository.update_reservation(reservation_found)
 
         database_client.commit()
-        database_client.close_connection()

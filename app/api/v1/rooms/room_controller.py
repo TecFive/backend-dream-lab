@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File
 
 from app.core.config import Settings
 from app.dtos.rooms.create_room_dto import CreateRoomDto
@@ -57,6 +57,16 @@ async def update_room(update_room_dto: UpdateRoomDto):
         roomService.update_room(update_room_dto)
 
         return {"data": "Room updated successfully"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@router.put("/update/image/{room_id}")
+async def add_image_to_room(room_id: str, image_url: str):
+    try:
+        roomService.add_image_to_room(room_id, image_url)
+
+        return {"data": "Image added to room successfully"}
     except Exception as e:
         return {"error": str(e)}
 

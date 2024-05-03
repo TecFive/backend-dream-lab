@@ -1,7 +1,9 @@
+import io
 from datetime import datetime
 from typing import List
 
 import bson
+from fastapi import UploadFile
 
 from app.db.client import database_client
 from app.db.models.rooms.room import Room
@@ -18,19 +20,16 @@ class RoomService:
 
     def get_all_rooms(self) -> List[Room]:
         rooms = self.room_repository.get_all_rooms()
-        database_client.close_connection()
 
         return rooms
 
     def find_room_by_id(self, room_id: str) -> Room:
         room = self.room_repository.find_room_by_id(room_id)
-        database_client.close_connection()
 
         return room
 
     def find_room_by_name(self, room_name: str) -> Room:
         room = self.room_repository.find_room_by_name(room_name)
-        database_client.close_connection()
 
         return room
 
@@ -48,7 +47,6 @@ class RoomService:
         self.room_repository.create_room(room)
 
         database_client.commit()
-        database_client.close_connection()
 
     def update_room(self, room_dto: UpdateRoomDto) -> None:
         room_found = self.room_repository.find_room_by_id(room_dto.id)
@@ -64,10 +62,20 @@ class RoomService:
         self.room_repository.update_room(room_found)
 
         database_client.commit()
-        database_client.close_connection()
+
+    def add_image_to_room(self, room_id: str, image_url: str) -> None:
+        room_found = self.room_repository.find_room_by_id(room_id)
+        if room_found is None:
+            raise Exception("Room not found.")
+
+        room_found.image = image_url
+        room_found.updated_at = datetime.now().isoformat()
+
+        self.room_repository.update_room(room_found)
+
+        database_client.commit()
 
     def delete_room(self, room_id: str) -> None:
         self.room_repository.delete_room(room_id)
 
         database_client.commit()
-        database_client.close_connection()

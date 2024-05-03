@@ -23,25 +23,21 @@ class UserService:
 
     def get_all_users(self) -> List[User]:
         users = self.user_repository.get_all_users()
-        database_client.close_connection()
 
         return users
 
     def get_all_users_by_career(self, career: str) -> List[User]:
         users = self.user_repository.get_all_users_by_career(career)
-        database_client.close_connection()
 
         return users
 
     def get_all_users_by_semester(self, semester: int) -> List[User]:
         users = self.user_repository.get_all_users_by_semester(semester)
-        database_client.close_connection()
 
         return users
 
     def find_user_by_id(self, user_id: str) -> User:
         user = self.user_repository.find_user_by_id(user_id)
-        database_client.close_connection()
 
         role_found = self.role_repository.find_role_by_id(user.role)
         user.role = role_found.name
@@ -50,7 +46,6 @@ class UserService:
 
     def find_user_by_email(self, email: str) -> User:
         user = self.user_repository.find_user_by_email(email)
-        database_client.close_connection()
 
         role_found = self.role_repository.find_role_by_id(user.role)
         user.role = role_found.name
@@ -77,7 +72,6 @@ class UserService:
         self.user_repository.create_user(user)
 
         database_client.commit()
-        database_client.close_connection()
 
         return user
 
@@ -96,7 +90,6 @@ class UserService:
         self.user_repository.update_user(user_found)
 
         database_client.commit()
-        database_client.close_connection()
 
         return user_found
 
@@ -117,7 +110,6 @@ class UserService:
         self.user_repository.update_user(user_found)
 
         database_client.commit()
-        database_client.close_connection()
 
         return user_found
 
@@ -125,6 +117,5 @@ class UserService:
         self.user_repository.delete_user(user_id)
 
         database_client.commit()
-        database_client.close_connection()
 
         return True

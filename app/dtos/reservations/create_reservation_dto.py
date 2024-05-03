@@ -9,5 +9,4 @@ class CreateReservationDto(BaseModel):
     start_date: datetime
     end_date: datetime
     reserved_equipment: List[str]
-    status: str
     comments: str

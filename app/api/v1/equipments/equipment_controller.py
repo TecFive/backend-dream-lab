@@ -80,6 +80,16 @@ async def update_equipment(equipment_data: UpdateEquipmentDto):
         return {"error": str(e)}
 
 
+@router.put("/update/image/{equipment_id}")
+async def add_image_to_equipment(equipment_id: str, image_url: str):
+    try:
+        equipmentService.add_image_to_equipment(equipment_id, image_url)
+
+        return {"data": "Image added to equipment successfully"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @router.delete("/{equipment_id}")
 async def delete_equipment(equipment_id: str):
     try:

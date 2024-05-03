@@ -16,19 +16,16 @@ class EquipmentStatusService:
 
     def get_all_equipment_statuses(self):
         statuses = self.equipment_status_repository.get_all_equipment_statuses()
-        database_client.close_connection()
 
         return statuses
 
     def find_equipment_status_by_id(self, equipment_status_id: str):
         status = self.equipment_status_repository.find_equipment_status_by_id(equipment_status_id)
-        database_client.close_connection()
 
         return status
 
     def find_equipment_status_by_name(self, equipment_status_name: str):
         status = self.equipment_status_repository.find_equipment_status_by_name(equipment_status_name)
-        database_client.close_connection()
 
         return status
 
@@ -44,7 +41,6 @@ class EquipmentStatusService:
         self.equipment_status_repository.create_equipment_status(equipment_status)
 
         database_client.commit()
-        database_client.close_connection()
 
     def update_equipment_status(self, equipment_status_dto: UpdateEquipmentStatusDto):
         equipment_status = self.equipment_status_repository.find_equipment_status_by_id(equipment_status_dto.id)
@@ -58,7 +54,6 @@ class EquipmentStatusService:
         self.equipment_status_repository.update_equipment_status(equipment_status)
 
         database_client.commit()
-        database_client.close_connection()
 
     def delete_equipment_status(self, equipment_status_id: str):
         equipment_status_found = self.find_equipment_status_by_id(equipment_status_id)
@@ -68,4 +63,3 @@ class EquipmentStatusService:
         self.equipment_status_repository.delete_equipment_status(equipment_status_id)
 
         database_client.commit()
-        database_client.close_connection()

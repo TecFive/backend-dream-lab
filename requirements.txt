@@ -9,3 +9,4 @@ bson~=0.5.10
 uvicorn
 gunicorn
 python-jose
+python-multipart

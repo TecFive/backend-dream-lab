@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -10,6 +10,7 @@ class Room(BaseModel):
     description: str
     capacity: int
     room_equipment: list[str]
+    image: Optional[str]
     created_at: datetime
     updated_at: datetime
 
@@ -26,6 +27,7 @@ class Room(BaseModel):
             description=room_persistence["description"],
             capacity=room_persistence["capacity"],
             room_equipment=room_equipment,
+            image=room_persistence["image"],
             created_at=room_persistence["created_at"],
             updated_at=room_persistence["updated_at"],
         )

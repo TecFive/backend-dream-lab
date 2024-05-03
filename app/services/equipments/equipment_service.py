@@ -17,31 +17,26 @@ class EquipmentService:
 
     def get_equipments(self) -> List[Equipment]:
         equipments = self.equipment_repository.get_all_equipments()
-        database_client.close_connection()
 
         return equipments
 
     def get_equipments_by_status(self, equipment_status: str) -> List[Equipment]:
         equipments = self.equipment_repository.get_equipment_by_status(equipment_status)
-        database_client.close_connection()
 
         return equipments
 
     def get_equipments_by_reservation_id(self, reservation_id: str) -> List[Equipment]:
         equipments = self.equipment_repository.get_equipment_by_reservation_id(reservation_id)
-        database_client.close_connection()
 
         return equipments
 
     def find_equipment_by_id(self, equipment_id: str) -> Equipment:
         equipment = self.equipment_repository.find_equipment_by_id(equipment_id)
-        database_client.close_connection()
 
         return equipment
 
     def find_equipment_by_name(self, equipment_name: str) -> Equipment:
         equipment = self.equipment_repository.find_equipment_by_name(equipment_name)
-        database_client.close_connection()
 
         return equipment
 
@@ -58,7 +53,6 @@ class EquipmentService:
         self.equipment_repository.create_equipment(equipment)
 
         database_client.commit()
-        database_client.close_connection()
 
         return equipment
 
@@ -76,9 +70,20 @@ class EquipmentService:
         self.equipment_repository.update_equipment(equipment)
 
         database_client.commit()
-        database_client.close_connection()
 
         return equipment
+
+    def add_image_to_equipment(self, equipment_id: str, image_url: str) -> None:
+        equipment = self.find_equipment_by_id(equipment_id)
+        if equipment is None:
+            raise ValueError("Equipment not found")
+
+        equipment.image = image_url
+        equipment.updated_at = datetime.now().isoformat()
+
+        self.equipment_repository.update_equipment(equipment)
+
+        database_client.commit()
 
     def delete_equipment(self, equipment_id: str) -> None:
         equipment_found = self.find_equipment_by_id(equipment_id)
@@ -88,4 +93,3 @@ class EquipmentService:
         self.equipment_repository.delete_equipment(equipment_id)
 
         database_client.commit()
-        database_client.close_connection()
