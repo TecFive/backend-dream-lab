@@ -3,7 +3,6 @@ from typing import List
 
 import bson
 
-from app.db.client import database_client
 from app.db.models.reservations.reservation import Reservation
 from app.db.models.users.user import User
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
@@ -119,8 +118,6 @@ class ReservationService:
 
         self.reservation_repository.create_reservation(new_reservation)
 
-        database_client.commit()
-
     def update_reservation(self, update_reservation_dto: UpdateReservationDto, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(update_reservation_dto.reservation_id)
         if not reservation_found:
@@ -136,8 +133,6 @@ class ReservationService:
         reservation_found.updated_at = datetime.now().isoformat()
 
         self.reservation_repository.update_reservation(reservation_found)
-
-        database_client.commit()
 
     def cancel_reservation(self, reservation_id: str, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(reservation_id)
@@ -158,5 +153,3 @@ class ReservationService:
         reservation_found.status = cancelled_status.id
 
         self.reservation_repository.update_reservation(reservation_found)
-
-        database_client.commit()

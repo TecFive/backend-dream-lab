@@ -1,7 +1,6 @@
 from datetime import datetime
 import bson
 
-from app.db.client import database_client
 from app.db.models.equipmentStatuses.equipment_status import EquipmentStatus
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
 from app.dtos.equipmentStatuses.create_equipment_status_dto import CreateEquipmentStatusDto
@@ -40,8 +39,6 @@ class EquipmentStatusService:
 
         self.equipment_status_repository.create_equipment_status(equipment_status)
 
-        database_client.commit()
-
     def update_equipment_status(self, equipment_status_dto: UpdateEquipmentStatusDto):
         equipment_status = self.equipment_status_repository.find_equipment_status_by_id(equipment_status_dto.id)
         if equipment_status is None:
@@ -53,8 +50,6 @@ class EquipmentStatusService:
 
         self.equipment_status_repository.update_equipment_status(equipment_status)
 
-        database_client.commit()
-
     def delete_equipment_status(self, equipment_status_id: str):
         equipment_status_found = self.find_equipment_status_by_id(equipment_status_id)
         if equipment_status_found is None:
@@ -62,4 +57,3 @@ class EquipmentStatusService:
 
         self.equipment_status_repository.delete_equipment_status(equipment_status_id)
 
-        database_client.commit()

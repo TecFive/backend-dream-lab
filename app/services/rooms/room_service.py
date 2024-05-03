@@ -3,9 +3,7 @@ from datetime import datetime
 from typing import List
 
 import bson
-from fastapi import UploadFile
 
-from app.db.client import database_client
 from app.db.models.rooms.room import Room
 from app.db.repositories.rooms.room_repository import RoomRepository
 from app.dtos.rooms.create_room_dto import CreateRoomDto
@@ -46,8 +44,6 @@ class RoomService:
 
         self.room_repository.create_room(room)
 
-        database_client.commit()
-
     def update_room(self, room_dto: UpdateRoomDto) -> None:
         room_found = self.room_repository.find_room_by_id(room_dto.id)
         if room_found is None:
@@ -61,8 +57,6 @@ class RoomService:
 
         self.room_repository.update_room(room_found)
 
-        database_client.commit()
-
     def add_image_to_room(self, room_id: str, image_url: str) -> None:
         room_found = self.room_repository.find_room_by_id(room_id)
         if room_found is None:
@@ -73,9 +67,5 @@ class RoomService:
 
         self.room_repository.update_room(room_found)
 
-        database_client.commit()
-
     def delete_room(self, room_id: str) -> None:
         self.room_repository.delete_room(room_id)
-
-        database_client.commit()

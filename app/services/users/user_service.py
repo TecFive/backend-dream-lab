@@ -4,7 +4,6 @@ from typing import List
 import bson
 
 from app.core.security import Security
-from app.db.client import database_client
 from app.db.models.users.user import User
 from app.db.repositories.roles.role_repository import RoleRepository
 from app.db.repositories.users.user_repository import UserRepository
@@ -71,8 +70,6 @@ class UserService:
 
         self.user_repository.create_user(user)
 
-        database_client.commit()
-
         return user
 
     def update_user(self, update_user_dto: UpdateUserDto) -> User:
@@ -88,8 +85,6 @@ class UserService:
         user_found.updated_at = datetime.now().isoformat()
 
         self.user_repository.update_user(user_found)
-
-        database_client.commit()
 
         return user_found
 
@@ -109,13 +104,9 @@ class UserService:
 
         self.user_repository.update_user(user_found)
 
-        database_client.commit()
-
         return user_found
 
     def delete_user(self, user_id: str) -> bool:
         self.user_repository.delete_user(user_id)
-
-        database_client.commit()
 
         return True

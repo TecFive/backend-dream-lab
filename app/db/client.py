@@ -16,15 +16,15 @@ class DatabaseClient:
 
     def get_conn(self) -> pyodbc.Cursor:
         try:
-            if self.connection is None:
-                self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
+            self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
 
             cursor = self.connection.cursor()
             return cursor
+        except pyodbc.OperationalError as e:
+            self.get_conn()
         except Exception as e:
             print(e)
             print('Cannot connect to SQL server')
-            self.close_connection()
 
     def commit(self) -> None:
         try:
@@ -32,14 +32,10 @@ class DatabaseClient:
         except Exception as e:
             print(e)
             print('Cannot commit changes to SQL server')
-            self.close_connection()
 
-    def close_connection(self) -> None:
+    def close(self) -> None:
         try:
             self.connection.close()
         except Exception as e:
             print(e)
             print('Cannot close connection to SQL server')
-
-
-database_client = DatabaseClient()

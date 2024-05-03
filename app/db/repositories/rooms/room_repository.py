@@ -2,27 +2,31 @@ import base64
 from typing import List
 
 from app.core.config import Settings
-from app.db.client import database_client
+from app.db.client import DatabaseClient
 from app.db.models.rooms.room import Room
 
 config = Settings()
 
 
 class RoomRepository:
-    cursor = database_client.get_conn()
+    database_client: DatabaseClient = DatabaseClient()
 
     def get_all_rooms(self) -> List[Room]:
         try:
-            self.cursor.execute(
+            cursor = self.database_client.get_conn()
+
+            cursor.execute(
                 f"SELECT * FROM {config.ENVIRONMENT}.Rooms"
             )
 
-            rows = self.cursor.fetchall()
+            rows = cursor.fetchall()
             if rows is not None:
-                columns = [column[0] for column in self.cursor.description]
+                columns = [column[0] for column in cursor.description]
                 rooms = [Room.create_from_persistence(dict(zip(columns, row))) for row in rows]
             else:
                 rooms = []
+
+            self.database_client.close()
 
             return rooms
         except Exception as e:
@@ -30,18 +34,22 @@ class RoomRepository:
 
     def find_room_by_id(self, room_id: str) -> Room:
         try:
-            self.cursor.execute(
+            cursor = self.database_client.get_conn()
+
+            cursor.execute(
                 f"SELECT * FROM {config.ENVIRONMENT}.Rooms WHERE id = '{room_id}'"
             )
 
-            row = self.cursor.fetchone()
+            row = cursor.fetchone()
             if row is not None:
-                columns = [column[0] for column in self.cursor.description]
+                columns = [column[0] for column in cursor.description]
                 room_dict = dict(zip(columns, row))
 
                 room = Room.create_from_persistence(room_dict)
             else:
                 room = None
+
+            self.database_client.close()
 
             return room
         except Exception as e:
@@ -49,18 +57,22 @@ class RoomRepository:
 
     def find_room_by_name(self, room_name: str) -> Room:
         try:
-            self.cursor.execute(
+            cursor = self.database_client.get_conn()
+
+            cursor.execute(
                 f"SELECT * FROM {config.ENVIRONMENT}.Rooms WHERE name = '{room_name}'"
             )
 
-            row = self.cursor.fetchone()
+            row = cursor.fetchone()
             if row is not None:
-                columns = [column[0] for column in self.cursor.description]
+                columns = [column[0] for column in cursor.description]
                 room_dict = dict(zip(columns, row))
 
                 room = Room.create_from_persistence(room_dict)
             else:
                 room = None
+
+            self.database_client.close()
 
             return room
         except Exception as e:
@@ -68,17 +80,24 @@ class RoomRepository:
 
     def create_room(self, room: Room) -> None:
         try:
+            cursor = self.database_client.get_conn()
+
             normalized_room_equipment = ",".join(room.room_equipment)
-            self.cursor.execute(
+            cursor.execute(
                 f"INSERT INTO {config.ENVIRONMENT}.Rooms (id, name, description, capacity, room_equipment, created_at, updated_at) VALUES ('{room.id}', '{room.name}', '{room.description}', {room.capacity}, '{normalized_room_equipment}', CAST('{room.created_at}' AS DATETIME2), CAST('{room.updated_at}' AS DATETIME2))"
             )
+
+            self.database_client.commit()
+            self.database_client.close()
         except Exception as e:
             raise e
 
     def update_room(self, room: Room) -> None:
         try:
+            cursor = self.database_client.get_conn()
+
             normalized_room_equipment = ",".join(room.room_equipment)
-            self.cursor.execute(
+            cursor.execute(
                 f"UPDATE {config.ENVIRONMENT}.Rooms SET name = ?, description = ?, capacity = ?, room_equipment = ?, image = ?, updated_at = CAST(? AS DATETIME2) WHERE id = ?",
                 (
                     room.name,
@@ -90,13 +109,21 @@ class RoomRepository:
                     room.id
                 )
             )
+
+            self.database_client.commit()
+            self.database_client.close()
         except Exception as e:
             raise e
 
     def delete_room(self, room_id: str) -> None:
         try:
-            self.cursor.execute(
+            cursor = self.database_client.get_conn()
+
+            cursor.execute(
                 f"DELETE FROM {config.ENVIRONMENT}.Rooms WHERE id = '{room_id}'"
             )
+
+            self.database_client.commit()
+            self.database_client.close()
         except Exception as e:
             raise e

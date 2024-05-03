@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List
 import bson
 
-from app.db.client import database_client
 from app.db.models.equipments.equipment import Equipment
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
 from app.dtos.equipments.create_equipment_dto import CreateEquipmentDto
@@ -52,8 +51,6 @@ class EquipmentService:
 
         self.equipment_repository.create_equipment(equipment)
 
-        database_client.commit()
-
         return equipment
 
     def update_equipment(self, equipment_dto: UpdateEquipmentDto) -> Equipment:
@@ -69,8 +66,6 @@ class EquipmentService:
 
         self.equipment_repository.update_equipment(equipment)
 
-        database_client.commit()
-
         return equipment
 
     def add_image_to_equipment(self, equipment_id: str, image_url: str) -> None:
@@ -83,13 +78,9 @@ class EquipmentService:
 
         self.equipment_repository.update_equipment(equipment)
 
-        database_client.commit()
-
     def delete_equipment(self, equipment_id: str) -> None:
         equipment_found = self.find_equipment_by_id(equipment_id)
         if equipment_found is None:
             raise ValueError("Equipment not found")
 
         self.equipment_repository.delete_equipment(equipment_id)
-
-        database_client.commit()

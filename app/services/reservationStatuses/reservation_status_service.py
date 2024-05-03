@@ -1,6 +1,5 @@
 from typing import List
 
-from app.db.client import database_client
 from app.db.models.reservationStatus.reservationStatus import ReservationStatus
 from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
 
@@ -29,14 +28,8 @@ class ReservationStatusService:
     def create_reservation_status(self, reservation_status: ReservationStatus) -> None:
         self.reservation_status_repository.create_reservation_status(reservation_status)
 
-        database_client.commit()
-
     def update_reservation_status(self, reservation_status: ReservationStatus) -> None:
         self.reservation_status_repository.update_reservation_status(reservation_status)
 
-        database_client.commit()
-
     def delete_reservation_status(self, reservation_status_id: str) -> None:
         self.reservation_status_repository.delete_reservation_status(reservation_status_id)
-
-        database_client.commit()
