@@ -1,3 +1,4 @@
+from datetime import time
 from typing import Optional
 
 import pyodbc
