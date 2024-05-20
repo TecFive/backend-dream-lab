@@ -48,3 +48,29 @@ async def has_jwt_access(credentials: HTTPAuthorizationCredentials = Depends(sec
         )
     except JOSEError as e:
         raise HTTPException(status_code=401, detail=str(e))
+
+
+def has_admin_access(token: HTTPAuthorizationCredentials = Depends(security)) -> User:
+    try:
+        payload = jwt.decode(
+            token.credentials, config.JWT_SECRET_KEY, algorithms=[config.JWT_ALGORITHM]
+        )
+
+        role = payload["role"].lower().replace(" ", "")
+        if role != "superadmin":
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        user = userService.find_user_by_id(payload["id"])
+
+        if not user:
+            raise HTTPException(
+                status_code=400, detail="Incorrect username or password"
+            )
+
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except Exception as e:
+        raise HTTPException(
+            status_code=401, detail=f"Could not validate credentials: {e}"
+        )

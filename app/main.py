@@ -1,3 +1,4 @@
+from app.api.v1.admin import admin_controller
 from app.api.v1.auth import auth_controller
 from app.api.v1.equipment_statuses import equipment_status_controller
 from app.api.v1.equipments import equipment_controller
@@ -68,6 +69,13 @@ app.include_router(
     user_controller.router,
     prefix="/v1/users",
     tags=["users"],
+    dependencies=PROTECTED
+)
+
+app.include_router(
+    admin_controller.router,
+    prefix="/v1/admin",
+    tags=["admin"],
     dependencies=PROTECTED
 )
 
