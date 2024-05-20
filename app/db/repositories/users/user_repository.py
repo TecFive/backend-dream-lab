@@ -130,6 +130,7 @@ class UserRepository:
                 f"INSERT INTO {config.ENVIRONMENT}.Users (id, name, email, password, career, semester, role, priority, created_at, updated_at) VALUES ('{user.id}', '{user.name.upper()}', '{user.email.upper()}', '{user.password}', '{user.career.upper()}', {user.semester}, '{user.role}', '{user.priority}', CAST('{str(user.created_at)}' AS DATETIME2), CAST('{str(user.updated_at)}' AS DATETIME2))"
             )
 
+            self.database_client.commit()
             self.database_client.close()
         except Exception as e:
             raise e
@@ -142,6 +143,7 @@ class UserRepository:
                 f"UPDATE {config.ENVIRONMENT}.Users SET name = '{user.name.upper()}', email = '{user.email.upper()}', career = '{user.career.upper()}', semester = {user.semester}, role = '{user.role}', priority = '{user.priority}', updated_at = CAST('{str(user.updated_at)}' AS DATETIME2) WHERE id = '{user.id}'"
             )
 
+            self.database_client.commit()
             self.database_client.close()
         except Exception as e:
             raise e
@@ -154,6 +156,7 @@ class UserRepository:
                 f"DELETE FROM {config.ENVIRONMENT}.Users WHERE id = '{user_id}'"
             )
 
+            self.database_client.commit()
             self.database_client.close()
         except Exception as e:
             raise e
