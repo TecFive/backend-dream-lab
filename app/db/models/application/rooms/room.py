@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from pydantic import BaseModel
+
+from app.db.models.application.equipments.equipment import Equipment
 
 
 class Room(BaseModel):
@@ -9,7 +11,7 @@ class Room(BaseModel):
     name: str
     description: str
     capacity: int
-    room_equipment: list[str]
+    room_equipment: List[Equipment]
     image: Optional[str]
     created_at: datetime
     updated_at: datetime

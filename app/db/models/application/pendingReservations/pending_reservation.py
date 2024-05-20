@@ -3,14 +3,18 @@ from typing import List, Any
 
 from pydantic import BaseModel
 
+from app.db.models.application.equipments.equipment import Equipment
+from app.db.models.application.rooms.room import Room
+from app.db.models.application.users.user import User
+
 
 class PendingReservation(BaseModel):
     id: str
-    user_id: str
-    room_id: str
+    user: User
+    room: Room
     start_date: datetime
     end_date: datetime
-    reserved_equipment: List[str]
+    reserved_equipment: List[Equipment]
     status: str
     comments: str
     created_at: datetime
