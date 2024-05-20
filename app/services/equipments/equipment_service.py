@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 import bson
 
-from app.db.models.equipments.equipment import Equipment
+from app.db.models.application.equipments.equipment import Equipment
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
 from app.dtos.equipments.create_equipment_dto import CreateEquipmentDto
 from app.dtos.equipments.update_equipment_dto import UpdateEquipmentDto

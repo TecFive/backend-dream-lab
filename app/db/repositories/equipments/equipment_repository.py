@@ -2,7 +2,7 @@ from typing import List
 
 from app.core.config import Settings
 from app.db.client import DatabaseClient
-from app.db.models.equipments.equipment import Equipment
+from app.db.models.application.equipments.equipment import Equipment
 
 config = Settings()
 

@@ -2,8 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends
 from app.core.config import Settings
-from app.core.security import Security
-from app.db.models.users.user import User
+from app.db.models.application.users.user import User
 from app.dependency import has_admin_access
 from app.services.admin.admin_service import AdminService
 

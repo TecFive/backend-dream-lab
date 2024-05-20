@@ -3,8 +3,8 @@ from typing import List
 
 import bson
 
-from app.db.models.reservations.reservation import Reservation
-from app.db.models.users.user import User
+from app.db.models.application.reservations.reservation import Reservation
+from app.db.models.application.users.user import User
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
 from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository

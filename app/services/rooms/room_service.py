@@ -4,7 +4,7 @@ from typing import List
 
 import bson
 
-from app.db.models.rooms.room import Room
+from app.db.models.application.rooms.room import Room
 from app.db.repositories.rooms.room_repository import RoomRepository
 from app.dtos.rooms.create_room_dto import CreateRoomDto
 from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto

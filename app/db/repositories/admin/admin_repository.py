@@ -2,7 +2,7 @@ from typing import List
 
 from app.core.config import Settings
 from app.db.client import DatabaseClient
-from app.db.models.reservations.reservation import Reservation
+from app.db.models.application.reservations.reservation import Reservation
 
 config = Settings()
 

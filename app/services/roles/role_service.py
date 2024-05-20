@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from app.db.models.roles.role import Role
+from app.db.models.application.roles.role import Role
 from app.db.repositories.roles.role_repository import RoleRepository
 from app.dtos.roles.create_role_dto import CreateRoleDto
 

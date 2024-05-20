@@ -2,7 +2,7 @@ from typing import List
 
 from app.core.config import Settings
 from app.db.client import DatabaseClient
-from app.db.models.roles.role import Role
+from app.db.models.application.roles.role import Role
 
 config = Settings()
 

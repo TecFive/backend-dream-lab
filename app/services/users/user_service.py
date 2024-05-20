@@ -4,7 +4,7 @@ from typing import List
 import bson
 
 from app.core.security import Security
-from app.db.models.users.user import User
+from app.db.models.application.users.user import User
 from app.db.repositories.roles.role_repository import RoleRepository
 from app.db.repositories.users.user_repository import UserRepository
 from app.dtos.roles.update_user_role_dto import UpdateUserRoleDto

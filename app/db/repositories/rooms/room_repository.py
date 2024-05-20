@@ -3,7 +3,7 @@ from typing import List
 
 from app.core.config import Settings
 from app.db.client import DatabaseClient
-from app.db.models.rooms.room import Room
+from app.db.models.application.rooms.room import Room
 from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto
 
 config = Settings()

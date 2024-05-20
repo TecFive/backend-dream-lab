@@ -1,6 +1,6 @@
 from typing import List
 
-from app.db.models.reservationStatus.reservationStatus import ReservationStatus
+from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
 from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
 
 

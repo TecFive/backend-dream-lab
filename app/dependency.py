@@ -3,7 +3,7 @@ from jose.exceptions import JOSEError
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.core.config import Settings
-from app.db.models.users.user import User
+from app.db.models.application.users.user import User
 from app.services.users.user_service import UserService
 
 config = Settings()

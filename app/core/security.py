@@ -4,7 +4,7 @@ import bcrypt
 from jose import jwt
 
 from app.core.config import Settings
-from app.db.models.users.user import User
+from app.db.models.application.users.user import User
 
 config = Settings()
 

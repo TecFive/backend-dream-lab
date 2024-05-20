@@ -1,7 +1,7 @@
 from datetime import datetime
 import bson
 
-from app.db.models.equipmentStatuses.equipment_status import EquipmentStatus
+from app.db.models.application.equipmentStatuses.equipment_status import EquipmentStatus
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
 from app.dtos.equipmentStatuses.create_equipment_status_dto import CreateEquipmentStatusDto
 from app.dtos.equipmentStatuses.update_equipment_status_dto import UpdateEquipmentStatusDto

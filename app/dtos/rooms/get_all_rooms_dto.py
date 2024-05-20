@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.db.models.equipments.equipment import Equipment
+from app.db.models.application.equipments.equipment import Equipment
 
 
 class GetAllRoomsDto(BaseModel):
