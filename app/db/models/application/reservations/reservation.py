@@ -26,15 +26,13 @@ class Reservation(BaseModel):
 
     @staticmethod
     def create_from_persistence(reservation_persistence) -> "Reservation":
-        reserved_equipment = reservation_persistence["reserved_equipment"].split(",") if isinstance(reservation_persistence["reserved_equipment"], str) else reservation_persistence["reserved_equipment"]
-
         return Reservation(
             id=reservation_persistence["id"],
-            user_id=reservation_persistence["user_id"],
-            room_id=reservation_persistence["room_id"],
+            user=reservation_persistence["user"],
+            room=reservation_persistence["room"],
             start_date=reservation_persistence["start_date"],
             end_date=reservation_persistence["end_date"],
-            reserved_equipment=reserved_equipment,
+            reserved_equipment=reservation_persistence["reserved_equipment"],
             status=reservation_persistence["status"],
             comments=reservation_persistence["comments"],
             created_at=reservation_persistence["created_at"],

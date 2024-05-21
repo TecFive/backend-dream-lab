@@ -40,35 +40,10 @@ class ReservationService:
 
         return reservations
 
-    def get_reservations_by_user_id(self, user_id: str) -> List[GetMyReservationsDto]:
+    def get_reservations_by_user_id(self, user_id: str) -> List[Reservation]:
         reservations = self.reservation_repository.get_reservations_by_user_id(user_id)
 
-        reservations_dto = []
-        for reservation in reservations:
-            equipment_dto = []
-
-            if len(reservation.reserved_equipment[0]) != 0:
-                for equipment in reservation.reserved_equipment:
-                    data = self.equipment_repository.find_equipment_by_id(equipment)
-                    equipment_dto.append(ReservationEquipmentDetailDto(
-                        id=data.id,
-                        name=data.name
-                    ))
-
-            room_data = self.room_repository.find_room_by_id(reservation.room_id)
-            status_data = self.reservation_status_repository.find_reservation_status_by_id(reservation.status)
-
-            reservations_dto.append(GetMyReservationsDto(
-                id=reservation.id,
-                name=room_data.name,
-                room_image=room_data.image,
-                status=status_data.name,
-                start_date=reservation.start_date,
-                end_date=reservation.end_date,
-                reserved_equipment=equipment_dto
-            ))
-
-        return reservations_dto
+        return reservations
 
     def get_reservation_by_id(self, reservation_id: str) -> Reservation:
         reservation = self.reservation_repository.find_reservation_by_id(reservation_id)

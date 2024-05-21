@@ -15,13 +15,49 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status"
+            query = f"""
+                SELECT 
+                    e.id AS id, 
+                    e.name AS name, 
+                    e.description AS description, 
+                    ES.id AS status_id, 
+                    ES.name AS status_name, 
+                    ES.description AS status_description, 
+                    ES.created_at AS status_created_at, 
+                    ES.updated_at AS status_updated_at, 
+                    e.reservation_id AS reservation_id, 
+                    e.created_at AS created_at, 
+                    e.updated_at AS updated_at, 
+                    e.image AS image 
+                FROM {config.ENVIRONMENT}.Equipment as e 
+                    INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status"""
             cursor.execute(query)
 
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
-                equipments = [Equipment.create_from_persistence(dict(zip(columns, row))) for row in rows]
+                equipments_data = [dict(zip(columns, row)) for row in rows]
+
+                equipments = []
+                for row in equipments_data:
+                    equipment_data = {
+                        "id": row["id"],
+                        "name": row["name"],
+                        "description": row["description"],
+                        "status": {
+                            "id": row["status_id"],
+                            "name": row["status_name"],
+                            "description": row["status_description"],
+                            "created_at": row["status_created_at"],
+                            "updated_at": row["status_updated_at"]
+                        },
+                        "reservation_id": row["reservation_id"],
+                        "image": row["image"],
+                        "created_at": row["created_at"],
+                        "updated_at": row["updated_at"]
+                    }
+
+                    equipments.append(Equipment.create_from_persistence(equipment_data))
             else:
                 equipments = []
 
@@ -41,7 +77,28 @@ class EquipmentRepository:
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
-                equipments = [Equipment.create_from_persistence(dict(zip(columns, row))) for row in rows]
+                equipments_data = [dict(zip(columns, row)) for row in rows]
+
+                equipments = []
+                for row in equipments_data:
+                    equipment_data = {
+                        "id": row["id"],
+                        "name": row["name"],
+                        "description": row["description"],
+                        "status": {
+                            "id": row["status_id"],
+                            "name": row["status_name"],
+                            "description": row["status_description"],
+                            "created_at": row["status_created_at"],
+                            "updated_at": row["status_updated_at"]
+                        },
+                        "reservation_id": row["reservation_id"],
+                        "image": row["image"],
+                        "created_at": row["created_at"],
+                        "updated_at": row["updated_at"]
+                    }
+
+                    equipments.append(Equipment.create_from_persistence(equipment_data))
             else:
                 equipments = []
 
@@ -61,7 +118,28 @@ class EquipmentRepository:
             rows = cursor.fetchall()
             if rows is not None:
                 columns = [column[0] for column in cursor.description]
-                equipments = [Equipment.create_from_persistence(dict(zip(columns, row))) for row in rows]
+                equipments_data = [dict(zip(columns, row)) for row in rows]
+
+                equipments = []
+                for row in equipments_data:
+                    equipment_data = {
+                        "id": row["id"],
+                        "name": row["name"],
+                        "description": row["description"],
+                        "status": {
+                            "id": row["status_id"],
+                            "name": row["status_name"],
+                            "description": row["status_description"],
+                            "created_at": row["status_created_at"],
+                            "updated_at": row["status_updated_at"]
+                        },
+                        "reservation_id": row["reservation_id"],
+                        "image": row["image"],
+                        "created_at": row["created_at"],
+                        "updated_at": row["updated_at"]
+                    }
+
+                    equipments.append(Equipment.create_from_persistence(equipment_data))
             else:
                 equipments = []
 
@@ -75,13 +153,47 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status WHERE e.id = '{equipment_id}'"
+            query = f"""SELECT 
+                     e.id AS id, 
+                     e.name AS name, 
+                     e.description AS description, 
+                     ES.id AS status_id, 
+                     ES.name AS status_name, 
+                     ES.description AS status_description, 
+                     ES.created_at AS status_created_at, 
+                     ES.updated_at AS status_updated_at, 
+                     e.reservation_id AS reservation_id, 
+                     e.created_at AS created_at, 
+                     e.updated_at AS updated_at, 
+                     e.image AS image 
+                FROM {config.ENVIRONMENT}.Equipment as e 
+                    INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status 
+                WHERE e.id = '{equipment_id}'"""
             cursor.execute(query)
 
             row = cursor.fetchone()
             if row is not None:
                 columns = [column[0] for column in cursor.description]
-                equipment = Equipment.create_from_persistence(dict(zip(columns, row)))
+                data = dict(zip(columns, row))
+
+                equipment_data = {
+                    "id": data["id"],
+                    "name": data["name"],
+                    "description": data["description"],
+                    "status": {
+                        "id": data["status_id"],
+                        "name": data["status_name"],
+                        "description": data["status_description"],
+                        "created_at": data["status_created_at"],
+                        "updated_at": data["status_updated_at"]
+                    },
+                    "reservation_id": data["reservation_id"],
+                    "image": data["image"],
+                    "created_at": data["created_at"],
+                    "updated_at": data["updated_at"]
+                }
+
+                equipment = Equipment.create_from_persistence(equipment_data)
             else:
                 equipment = {}
 
@@ -101,7 +213,26 @@ class EquipmentRepository:
             row = cursor.fetchone()
             if row is not None:
                 columns = [column[0] for column in cursor.description]
-                equipment = Equipment.create_from_persistence(dict(zip(columns, row)))
+                data = dict(zip(columns, row))
+
+                equipment_data = {
+                    "id": data["id"],
+                    "name": data["name"],
+                    "description": data["description"],
+                    "status": {
+                        "id": data["status_id"],
+                        "name": data["status_name"],
+                        "description": data["status_description"],
+                        "created_at": data["status_created_at"],
+                        "updated_at": data["status_updated_at"]
+                    },
+                    "reservation_id": data["reservation_id"],
+                    "image": data["image"],
+                    "created_at": data["created_at"],
+                    "updated_at": data["updated_at"]
+                }
+
+                equipment = Equipment.create_from_persistence(equipment_data)
             else:
                 equipment = {}
 

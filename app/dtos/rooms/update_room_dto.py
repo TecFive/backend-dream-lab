@@ -1,11 +1,12 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 
 class UpdateRoomDto(BaseModel):
     id: str
-    name: str
-    description: str
-    capacity: int
-    room_equipment: List[str]
+    name: Optional[str]
+    description: Optional[str]
+    capacity: Optional[int]
+    room_equipment: Optional[List[str]]
+    image: Optional[str]
