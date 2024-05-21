@@ -3,6 +3,7 @@ from typing import List
 import bson
 
 from app.db.models.application.equipments.equipment import Equipment
+from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
 from app.dtos.equipments.create_equipment_dto import CreateEquipmentDto
 from app.dtos.equipments.update_equipment_dto import UpdateEquipmentDto
@@ -10,9 +11,11 @@ from app.dtos.equipments.update_equipment_dto import UpdateEquipmentDto
 
 class EquipmentService:
     equipment_repository: EquipmentRepository
+    equipment_status_repository: EquipmentStatusRepository
 
     def __init__(self):
         self.equipment_repository = EquipmentRepository()
+        self.equipment_status_repository = EquipmentStatusRepository()
 
     def get_equipments(self) -> List[Equipment]:
         equipments = self.equipment_repository.get_all_equipments()
@@ -40,13 +43,20 @@ class EquipmentService:
         return equipment
 
     def create_equipment(self, equipment_dto: CreateEquipmentDto) -> Equipment:
+        equipment_status_found = self.equipment_status_repository.find_equipment_status_by_id(equipment_dto.status)
+
+        if equipment_status_found is None:
+            raise ValueError("Equipment status not found")
+
         equipment = Equipment(
             id=str(bson.ObjectId()),
             name=equipment_dto.name,
             description=equipment_dto.description,
-            status=equipment_dto.status,
-            createdAt=datetime.now().isoformat(),
-            updatedAt=datetime.now().isoformat(),
+            status=equipment_status_found,
+            reservation_id=None,
+            image=equipment_dto.image,
+            created_at=datetime.now().isoformat(),
+            updated_at=datetime.now().isoformat(),
         )
 
         self.equipment_repository.create_equipment(equipment)
@@ -58,9 +68,15 @@ class EquipmentService:
         if equipment is None:
             raise ValueError("Equipment not found")
 
+        equipment_status_found = self.equipment_status_repository.find_equipment_status_by_id(equipment_dto.status)
+
+        if equipment_status_found is None:
+            raise ValueError("Equipment status not found")
+
         equipment.name = equipment_dto.name
         equipment.description = equipment_dto.description
-        equipment.status = equipment_dto.status
+        equipment.image = equipment_dto.image
+        equipment.status = equipment_status_found
         equipment.reservation_id = equipment_dto.reservation_id
         equipment.updated_at = datetime.now().isoformat()
 

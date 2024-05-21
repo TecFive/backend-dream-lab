@@ -3,6 +3,7 @@ from typing import List
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.roles.role import Role
+from app.db.models.persistence.roles.role import RolePersistence
 
 config = Settings()
 
@@ -80,11 +81,13 @@ class RoleRepository:
 
     def create_role(self, role: Role) -> None:
         try:
+            role_persistence = RolePersistence.create_from_application(role)
+
             cursor = self.database_client.get_conn()
 
-            normalized_permissions = ",".join(role.permissions)
+            normalized_permissions = ",".join(role_persistence.permissions)
             cursor.execute(
-                f"INSERT INTO {config.ENVIRONMENT}.Roles (id, name, description, permissions, priority, created_at, updated_at) VALUES ('{role.id}', '{role.name.upper()}', '{role.description}', '{normalized_permissions}', '{role.priority}', CAST('{role.created_at}' AS DATETIME2), CAST('{role.updated_at}' AS DATETIME2))"
+                f"INSERT INTO {config.ENVIRONMENT}.Roles (id, name, description, permissions, priority, created_at, updated_at) VALUES ('{role_persistence.id}', '{role_persistence.name.upper()}', '{role_persistence.description}', '{normalized_permissions}', '{role_persistence.priority}', CAST('{role_persistence.created_at}' AS DATETIME2), CAST('{role_persistence.updated_at}' AS DATETIME2))"
             )
 
             self.database_client.commit()
@@ -94,11 +97,13 @@ class RoleRepository:
 
     def update_role(self, role: Role) -> None:
         try:
+            role_persistence = RolePersistence.create_from_application(role)
+
             cursor = self.database_client.get_conn()
 
-            normalized_permissions = ",".join(role.permissions)
+            normalized_permissions = ",".join(role_persistence.permissions)
             cursor.execute(
-                f"UPDATE {config.ENVIRONMENT}.Roles SET name = '{role.name.upper()}', description = '{role.description}', permissions = '{normalized_permissions}', priority = '{role.priority}', updated_at = CAST('{role.updated_at}' AS DATETIME2) WHERE id = '{role.id}'"
+                f"UPDATE {config.ENVIRONMENT}.Roles SET name = '{role_persistence.name.upper()}', description = '{role_persistence.description}', permissions = '{normalized_permissions}', priority = '{role_persistence.priority}', updated_at = CAST('{role_persistence.updated_at}' AS DATETIME2) WHERE id = '{role_persistence.id}'"
             )
 
             self.database_client.commit()

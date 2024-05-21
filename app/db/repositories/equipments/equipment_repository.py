@@ -3,6 +3,7 @@ from typing import List
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.equipments.equipment import Equipment
+from app.db.models.persistence.equipments.equipment import EquipmentPersistence
 
 config = Settings()
 
@@ -14,9 +15,8 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Equipment"
-            )
+            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status"
+            cursor.execute(query)
 
             rows = cursor.fetchall()
             if rows is not None:
@@ -35,9 +35,8 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Equipment WHERE status = '{equipment_status}'"
-            )
+            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status WHERE e.status = '{equipment_status}'"
+            cursor.execute(query)
 
             rows = cursor.fetchall()
             if rows is not None:
@@ -56,9 +55,8 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Equipment WHERE reservation_id = '{reservation_id}'"
-            )
+            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status WHERE e.reservation_id = '{reservation_id}'"
+            cursor.execute(query)
 
             rows = cursor.fetchall()
             if rows is not None:
@@ -77,9 +75,8 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Equipment WHERE id = '{equipment_id}'"
-            )
+            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status WHERE e.id = '{equipment_id}'"
+            cursor.execute(query)
 
             row = cursor.fetchone()
             if row is not None:
@@ -98,9 +95,8 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            cursor.execute(
-                f"SELECT * FROM {config.ENVIRONMENT}.Equipment WHERE name = '{equipment_name}'"
-            )
+            query = f"SELECT e.id AS id, e.name AS name, e.description AS description, ES.id AS status_id, ES.name AS status_name, ES.description AS status_description, ES.created_at AS status_created_at, ES.updated_at AS status_updated_at, e.reservation_id AS reservation_id, e.created_at AS created_at, e.updated_at AS updated_at, e.image AS image FROM {config.ENVIRONMENT}.Equipment as e INNER JOIN {config.ENVIRONMENT}.EquipmentStatus ES on ES.id = e.status WHERE e.name = '{equipment_name}'"
+            cursor.execute(query)
 
             row = cursor.fetchone()
             if row is not None:
@@ -117,11 +113,23 @@ class EquipmentRepository:
 
     def create_equipment(self, equipment: Equipment) -> None:
         try:
+            equipment_persistence = EquipmentPersistence.create_from_application(equipment)
+
             cursor = self.database_client.get_conn()
 
+            query = f"INSERT INTO {config.ENVIRONMENT}.Equipment (id, name, description, status, reservation_id, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CAST(? AS DATETIME2), CAST(? AS DATETIME2))"
             cursor.execute(
-                f"INSERT INTO {config.ENVIRONMENT}.Equipment (id, name, description, status, reservation_id, created_at, updated_at) "
-                f"VALUES ('{equipment.id}', '{equipment.name}', '{equipment.description}', '{equipment.status}', '{equipment.reservation_id}', CAST('{equipment.created_at}' AS DATETIME2), CAST('{equipment.updated_at}' AS DATETIME2))"
+                query,
+                (
+                    equipment_persistence.id,
+                    equipment_persistence.name,
+                    equipment_persistence.description,
+                    equipment_persistence.status,
+                    equipment_persistence.reservation_id,
+                    equipment_persistence.image,
+                    equipment_persistence.created_at,
+                    equipment_persistence.updated_at
+                )
             )
 
             self.database_client.commit()
@@ -131,17 +139,20 @@ class EquipmentRepository:
 
     def update_equipment(self, equipment: Equipment) -> None:
         try:
+            equipment_persistence = EquipmentPersistence.create_from_application(equipment)
+
             cursor = self.database_client.get_conn()
 
+            query = f"UPDATE {config.ENVIRONMENT}.Equipment SET name = ?, description = ?, status = ?, image = ?, updated_at = CAST(? AS DATETIME2) WHERE id = ?"
             cursor.execute(
-                f"UPDATE {config.ENVIRONMENT}.Equipment SET name = ?, description = ?, status = ?, image = ?, updated_at = CAST(? AS DATETIME2) WHERE id = ?",
+                query,
                 (
-                    equipment.name,
-                    equipment.description,
-                    equipment.status,
-                    equipment.image,
-                    equipment.updated_at,
-                    equipment.id
+                    equipment_persistence.name,
+                    equipment_persistence.description,
+                    equipment_persistence.status,
+                    equipment_persistence.image,
+                    equipment_persistence.updated_at,
+                    equipment_persistence.id
                 )
             )
 
@@ -154,9 +165,8 @@ class EquipmentRepository:
         try:
             cursor = self.database_client.get_conn()
 
-            cursor.execute(
-                f"DELETE FROM {config.ENVIRONMENT}.Equipment WHERE id = '{equipment_id}'"
-            )
+            query = f"DELETE FROM {config.ENVIRONMENT}.Equipment WHERE id = ?"
+            cursor.execute(query, equipment_id)
 
             self.database_client.commit()
             self.database_client.close()

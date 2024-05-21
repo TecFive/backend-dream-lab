@@ -3,6 +3,7 @@ from typing import List
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
+from app.db.models.persistence.reservationStatus.reservationStatus import ReservationStatusPersistence
 
 config = Settings()
 
@@ -80,10 +81,12 @@ class ReservationStatusRepository:
 
     def create_reservation_status(self, reservation_status: ReservationStatus) -> None:
         try:
+            reservation_status_persistence = ReservationStatusPersistence.create_from_application(reservation_status)
+
             cursor = self.database_client.get_conn()
 
             cursor.execute(
-                f"INSERT INTO {config.ENVIRONMENT}.ReservationStatus (id, name, description, created_at, updated_at) VALUES ('{reservation_status.id}', '{reservation_status.name}', '{reservation_status.description}', CAST('{reservation_status.created_at}' AS DATETIME2), CAST('{reservation_status.updated_at}' AS DATETIME2))"
+                f"INSERT INTO {config.ENVIRONMENT}.ReservationStatus (id, name, description, created_at, updated_at) VALUES ('{reservation_status_persistence.id}', '{reservation_status_persistence.name}', '{reservation_status_persistence.description}', CAST('{reservation_status_persistence.created_at}' AS DATETIME2), CAST('{reservation_status_persistence.updated_at}' AS DATETIME2))"
             )
 
             self.database_client.commit()
@@ -93,10 +96,12 @@ class ReservationStatusRepository:
 
     def update_reservation_status(self, reservation_status: ReservationStatus) -> None:
         try:
+            reservation_status_persistence = ReservationStatusPersistence.create_from_application(reservation_status)
+
             cursor = self.database_client.get_conn()
 
             cursor.execute(
-                f"UPDATE {config.ENVIRONMENT}.ReservationStatus SET name = '{reservation_status.name}', description = '{reservation_status.description}', updated_at = CAST('{reservation_status.updated_at}' AS DATETIME2) WHERE id = '{reservation_status.id}'"
+                f"UPDATE {config.ENVIRONMENT}.ReservationStatus SET name = '{reservation_status_persistence.name}', description = '{reservation_status_persistence.description}', updated_at = CAST('{reservation_status_persistence.updated_at}' AS DATETIME2) WHERE id = '{reservation_status_persistence.id}'"
             )
 
             self.database_client.commit()

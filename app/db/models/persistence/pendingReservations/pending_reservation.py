@@ -3,8 +3,10 @@ from typing import List, Any
 
 from pydantic import BaseModel
 
+from app.db.models.application.pendingReservations.pending_reservation import PendingReservation
 
-class PendingReservation(BaseModel):
+
+class PendingReservationPersistence(BaseModel):
     id: str
     user_id: str
     room_id: str
@@ -20,18 +22,18 @@ class PendingReservation(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(pending_reservation_persistence) -> "PendingReservation":
-        reserved_equipment = pending_reservation_persistence["reserved_equipment"].split(",") if isinstance(pending_reservation_persistence["reserved_equipment"], str) else pending_reservation_persistence["reserved_equipment"]
+    def create_from_application(pending_reservation: PendingReservation) -> "PendingReservationPersistence":
+        reserved_equipment = [pr.id for pr in pending_reservation.reserved_equipment]
 
-        return PendingReservation(
-            id=pending_reservation_persistence["id"],
-            user_id=pending_reservation_persistence["user_id"],
-            room_id=pending_reservation_persistence["room_id"],
-            start_date=pending_reservation_persistence["start_date"],
-            end_date=pending_reservation_persistence["end_date"],
+        return PendingReservationPersistence(
+            id=pending_reservation.id,
+            user_id=pending_reservation.user_id,
+            room_id=pending_reservation.room_id,
+            start_date=pending_reservation.start_date,
+            end_date=pending_reservation.end_date,
             reserved_equipment=reserved_equipment,
-            status=pending_reservation_persistence["status"],
-            comments=pending_reservation_persistence["comments"],
-            created_at=pending_reservation_persistence["created_at"],
-            updated_at=pending_reservation_persistence["updated_at"],
+            status=pending_reservation.status,
+            comments=pending_reservation.comments,
+            created_at=pending_reservation.created_at,
+            updated_at=pending_reservation.updated_at
         )

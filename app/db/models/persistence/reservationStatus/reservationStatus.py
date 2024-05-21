@@ -3,8 +3,10 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
 
-class ReservationStatus(BaseModel):
+
+class ReservationStatusPersistence(BaseModel):
     id: str
     name: str
     description: str
@@ -15,11 +17,11 @@ class ReservationStatus(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(user_persistence) -> "ReservationStatus":
-        return ReservationStatus(
-            id=user_persistence["id"],
-            name=user_persistence["name"],
-            description=user_persistence["description"],
-            created_at=user_persistence["created_at"],
-            updated_at=user_persistence["updated_at"],
+    def create_from_application(reservation_status: ReservationStatus) -> "ReservationStatusPersistence":
+        return ReservationStatusPersistence(
+            id=reservation_status.id,
+            name=reservation_status.name,
+            description=reservation_status.description,
+            created_at=reservation_status.created_at,
+            updated_at=reservation_status.updated_at
         )

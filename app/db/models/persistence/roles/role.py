@@ -3,8 +3,10 @@ from typing import Any, List
 
 from pydantic import BaseModel
 
+from app.db.models.application.roles.role import Role
 
-class Role(BaseModel):
+
+class RolePersistence(BaseModel):
     id: str
     name: str
     description: str
@@ -17,15 +19,15 @@ class Role(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(user_persistence) -> "Role":
-        permissions = user_persistence["permissions"].split(",") if isinstance(user_persistence["permissions"], str) else user_persistence["permissions"]
+    def create_from_application(role: Role) -> "RolePersistence":
+        permissions = role.permissions.split(",") if isinstance(role.permissions, str) else role.permissions
 
-        return Role(
-            id=user_persistence["id"],
-            name=user_persistence["name"],
-            description=user_persistence["description"],
+        return RolePersistence(
+            id=role["id"],
+            name=role["name"],
+            description=role["description"],
             permissions=permissions,
-            priority=user_persistence["priority"],
-            created_at=user_persistence["created_at"],
-            updated_at=user_persistence["updated_at"],
+            priority=role["priority"],
+            created_at=role["created_at"],
+            updated_at=role["updated_at"]
         )

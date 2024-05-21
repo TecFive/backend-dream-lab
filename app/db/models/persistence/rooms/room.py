@@ -3,8 +3,10 @@ from typing import Any, Optional
 
 from pydantic import BaseModel
 
+from app.db.models.application.rooms.room import Room
 
-class Room(BaseModel):
+
+class RoomPersistence(BaseModel):
     id: str
     name: str
     description: str
@@ -18,16 +20,16 @@ class Room(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(room_persistence) -> "Room":
-        room_equipment = room_persistence["room_equipment"].split(",") if isinstance(room_persistence["room_equipment"], str) else room_persistence["room_equipment"]
+    def create_from_application(room: Room) -> "RoomPersistence":
+        room_equipment = [e.id for e in room.room_equipment]
 
-        return Room(
-            id=room_persistence["id"],
-            name=room_persistence["name"],
-            description=room_persistence["description"],
-            capacity=room_persistence["capacity"],
+        return RoomPersistence(
+            id=room.id,
+            name=room.name,
+            description=room.description,
+            capacity=room.capacity,
             room_equipment=room_equipment,
-            image=room_persistence["image"],
-            created_at=room_persistence["created_at"],
-            updated_at=room_persistence["updated_at"],
+            image=room.image,
+            created_at=room.created_at,
+            updated_at=room.updated_at
         )

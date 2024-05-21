@@ -4,6 +4,7 @@ from typing import List
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.rooms.room import Room
+from app.db.models.persistence.rooms.room import RoomPersistence
 from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto
 
 config = Settings()
@@ -121,11 +122,13 @@ class RoomRepository:
 
     def create_room(self, room: Room) -> None:
         try:
+            room_persistence = RoomPersistence.create_from_application(room)
+
             cursor = self.database_client.get_conn()
 
-            normalized_room_equipment = ",".join(room.room_equipment)
+            normalized_room_equipment = ",".join(room_persistence.room_equipment)
             cursor.execute(
-                f"INSERT INTO {config.ENVIRONMENT}.Rooms (id, name, description, capacity, room_equipment, created_at, updated_at) VALUES ('{room.id}', '{room.name}', '{room.description}', {room.capacity}, '{normalized_room_equipment}', CAST('{room.created_at}' AS DATETIME2), CAST('{room.updated_at}' AS DATETIME2))"
+                f"INSERT INTO {config.ENVIRONMENT}.Rooms (id, name, description, capacity, room_equipment, created_at, updated_at) VALUES ('{room_persistence.id}', '{room_persistence.name}', '{room_persistence.description}', {room_persistence.capacity}, '{normalized_room_equipment}', CAST('{room_persistence.created_at}' AS DATETIME2), CAST('{room_persistence.updated_at}' AS DATETIME2))"
             )
 
             self.database_client.commit()
@@ -135,19 +138,21 @@ class RoomRepository:
 
     def update_room(self, room: Room) -> None:
         try:
+            room_persistence = RoomPersistence.create_from_application(room)
+
             cursor = self.database_client.get_conn()
 
-            normalized_room_equipment = ",".join(room.room_equipment)
+            normalized_room_equipment = ",".join(room_persistence.room_equipment)
             cursor.execute(
                 f"UPDATE {config.ENVIRONMENT}.Rooms SET name = ?, description = ?, capacity = ?, room_equipment = ?, image = ?, updated_at = CAST(? AS DATETIME2) WHERE id = ?",
                 (
-                    room.name,
-                    room.description,
-                    room.capacity,
+                    room_persistence.name,
+                    room_persistence.description,
+                    room_persistence.capacity,
                     normalized_room_equipment,
-                    room.image,
-                    room.updated_at,
-                    room.id
+                    room_persistence.image,
+                    room_persistence.updated_at,
+                    room_persistence.id
                 )
             )
 

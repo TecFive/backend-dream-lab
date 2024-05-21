@@ -6,6 +6,7 @@ import bson
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.reservations.reservation import Reservation
+from app.db.models.persistence.reservations.reservation import ReservationPersistence
 from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
 
 config = Settings()
@@ -136,12 +137,14 @@ class ReservationRepository:
 
     def create_reservation(self, reservation: Reservation) -> None:
         try:
+            reservation_persistence = ReservationPersistence.create_from_application(reservation)
+
             cursor = self.database_client.get_conn()
 
-            normalized_reserved_equipment = ",".join(reservation.reserved_equipment)
+            normalized_reserved_equipment = ",".join(reservation_persistence.reserved_equipment)
 
             sql_command = f"INSERT INTO [{config.ENVIRONMENT}].Reservations (id, user_id, room_id, start_date, end_date, reserved_equipment, status, comments, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            values = (reservation.id, reservation.user_id, reservation.room_id, reservation.start_date, reservation.end_date, normalized_reserved_equipment, reservation.status, reservation.comments, reservation.created_at, reservation.updated_at)
+            values = (reservation_persistence.id, reservation_persistence.user_id, reservation_persistence.room_id, reservation_persistence.start_date, reservation_persistence.end_date, normalized_reserved_equipment, reservation_persistence.status, reservation_persistence.comments, reservation_persistence.created_at, reservation_persistence.updated_at)
             cursor.execute(sql_command, values)
 
             self.database_client.commit()
@@ -151,13 +154,15 @@ class ReservationRepository:
 
     def update_reservation(self, reservation: Reservation) -> None:
         try:
+            reservation_persistence = ReservationPersistence.create_from_application(reservation)
+
             cursor = self.database_client.get_conn()
 
-            normalized_reserved_equipment = ",".join(reservation.reserved_equipment)
+            normalized_reserved_equipment = ",".join(reservation_persistence.reserved_equipment)
             cursor.execute(
-                f"UPDATE {config.ENVIRONMENT}.Reservations SET start_date = CAST('{reservation.start_date}' AS DATETIME2), end_date = CAST('{reservation.end_date}' AS DATETIME2), "
-                f"reserved_equipment = '{normalized_reserved_equipment}', status = '{reservation.status}', comments = '{reservation.comments}', "
-                f"updated_at = CAST('{str(reservation.updated_at)}' AS DATETIME2) WHERE id = '{reservation.id}'"
+                f"UPDATE {config.ENVIRONMENT}.Reservations SET start_date = CAST('{reservation_persistence.start_date}' AS DATETIME2), end_date = CAST('{reservation_persistence.end_date}' AS DATETIME2), "
+                f"reserved_equipment = '{normalized_reserved_equipment}', status = '{reservation_persistence.status}', comments = '{reservation_persistence.comments}', "
+                f"updated_at = CAST('{str(reservation_persistence.updated_at)}' AS DATETIME2) WHERE id = '{reservation_persistence.id}'"
             )
 
             self.database_client.commit()

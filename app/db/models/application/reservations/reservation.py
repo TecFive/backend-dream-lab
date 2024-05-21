@@ -4,6 +4,7 @@ from typing import Any, List
 from pydantic import BaseModel
 
 from app.db.models.application.equipments.equipment import Equipment
+from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
 from app.db.models.application.rooms.room import Room
 from app.db.models.application.users.user import User
 
@@ -15,7 +16,7 @@ class Reservation(BaseModel):
     start_date: datetime
     end_date: datetime
     reserved_equipment: List[Equipment]
-    status: str
+    status: ReservationStatus
     comments: str
     created_at: datetime
     updated_at: datetime

@@ -3,8 +3,10 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.db.models.application.users.user import User
 
-class User(BaseModel):
+
+class UserPersistence(BaseModel):
     id: str
     name: str
     email: str
@@ -20,16 +22,16 @@ class User(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(user_persistence) -> "User":
-        return User(
-            id=user_persistence["id"],
-            name=user_persistence["name"],
-            email=user_persistence["email"],
-            password=user_persistence["password"],
-            career=user_persistence["career"],
-            semester=user_persistence["semester"],
-            role=user_persistence["role"],
-            priority=user_persistence["priority"],
-            created_at=user_persistence["created_at"],
-            updated_at=user_persistence["updated_at"]
+    def create_from_application(user: User) -> "UserPersistence":
+        return UserPersistence(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            password=user.password,
+            career=user.career,
+            semester=user.semester,
+            role=user.role,
+            priority=user.priority,
+            created_at=user.created_at,
+            updated_at=user.updated_at
         )

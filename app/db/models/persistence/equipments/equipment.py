@@ -3,8 +3,10 @@ from typing import Optional, Any
 
 from pydantic import BaseModel
 
+from app.db.models.application.equipments.equipment import Equipment
 
-class Equipment(BaseModel):
+
+class EquipmentPersistence(BaseModel):
     id: str
     name: str
     description: str
@@ -18,14 +20,14 @@ class Equipment(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(equipment_persistence) -> "Equipment":
-        return Equipment(
-            id=equipment_persistence["id"],
-            name=equipment_persistence["name"],
-            description=equipment_persistence["description"],
-            status=equipment_persistence["status"],
-            reservation_id=equipment_persistence["reservation_id"],
-            image=equipment_persistence["image"],
-            created_at=equipment_persistence["created_at"],
-            updated_at=equipment_persistence["updated_at"],
+    def create_from_application(equipment: Equipment) -> "EquipmentPersistence":
+        return EquipmentPersistence(
+            id=equipment.id,
+            name=equipment.name,
+            description=equipment.description,
+            status=equipment.status.id,
+            reservation_id=equipment.reservation_id,
+            image=equipment.image,
+            created_at=equipment.created_at,
+            updated_at=equipment.updated_at
         )

@@ -3,8 +3,10 @@ from typing import Any, List
 
 from pydantic import BaseModel
 
+from app.db.models.application.reservations.reservation import Reservation
 
-class Reservation(BaseModel):
+
+class ReservationPersistence(BaseModel):
     id: str
     user_id: str
     room_id: str
@@ -20,18 +22,18 @@ class Reservation(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def create_from_persistence(reservation_persistence) -> "Reservation":
-        reserved_equipment = reservation_persistence["reserved_equipment"].split(",") if isinstance(reservation_persistence["reserved_equipment"], str) else reservation_persistence["reserved_equipment"]
+    def create_from_application(reservation: Reservation) -> "ReservationPersistence":
+        reserved_equipment = [r.id for r in reservation.reserved_equipment]
 
-        return Reservation(
-            id=reservation_persistence["id"],
-            user_id=reservation_persistence["user_id"],
-            room_id=reservation_persistence["room_id"],
-            start_date=reservation_persistence["start_date"],
-            end_date=reservation_persistence["end_date"],
+        return ReservationPersistence(
+            id=reservation.id,
+            user_id=reservation.user_id,
+            room_id=reservation.room_id,
+            start_date=reservation.start_date,
+            end_date=reservation.end_date,
             reserved_equipment=reserved_equipment,
-            status=reservation_persistence["status"],
-            comments=reservation_persistence["comments"],
-            created_at=reservation_persistence["created_at"],
-            updated_at=reservation_persistence["updated_at"],
+            status=reservation.status,
+            comments=reservation.comments,
+            created_at=reservation.created_at,
+            updated_at=reservation.updated_at
         )
