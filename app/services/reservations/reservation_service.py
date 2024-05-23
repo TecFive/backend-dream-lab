@@ -56,10 +56,11 @@ class ReservationService:
         return available_hours
 
     def create_reservation(self, reservation: CreateReservationDto, user: User) -> None:
-        status_found = self.reservation_status_repository.find_reservation_status_by_name("Pending")
+        status_found = self.reservation_status_repository.find_reservation_status_by_name("Approved")
         if not status_found:
             raise Exception("Reservation status could not be found")
 
+        reservation_id = str(bson.ObjectId())
         for equipment in reservation.reserved_equipment:
             equipment_found = self.equipment_repository.find_equipment_by_id(equipment)
             if not equipment_found:
@@ -77,12 +78,13 @@ class ReservationService:
                 raise Exception("Equipment is not available")
 
             equipment_found.status = in_use_equipment_status_found.id
+            equipment_found.reservation_id = reservation_id
             equipment_found.updated_at = datetime.now().isoformat()
 
             self.equipment_repository.update_equipment(equipment_found)
 
         new_reservation = Reservation(
-            id=str(bson.ObjectId()),
+            id=reservation_id,
             user_id=user.id,
             room_id=reservation.room_id,
             start_date=reservation.start_date,

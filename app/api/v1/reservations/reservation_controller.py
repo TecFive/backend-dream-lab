@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from app.core.config import Settings
 from app.db.models.application.users.user import User
 from app.dependency import get_current_user
@@ -19,7 +19,7 @@ async def get_all_reservations():
 
         return {"data": reservations}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/my-reservations")
@@ -29,7 +29,7 @@ async def get_my_reservations(current_user: User = Depends(get_current_user)):
 
         return {"data": reservations}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/available/hours/{date}")
@@ -39,7 +39,7 @@ async def get_available_hours(date: str):
 
         return {"data": available_hours}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/{reservation_id}")
@@ -49,7 +49,7 @@ async def find_reservation_by_id(reservation_id: str):
 
         return {"data": reservation}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/")
@@ -59,7 +59,7 @@ async def create_reservation(create_reservation_dto: CreateReservationDto, curre
 
         return {"data": "Reservation created successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.put("/")
@@ -69,7 +69,7 @@ async def update_reservation(update_reservation_dto: UpdateReservationDto, curre
 
         return {"data": "Reservation updated successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/{reservation_id}")
@@ -77,4 +77,4 @@ async def cancel_reservation(reservation_id: str, current_user: User = Depends(g
     try:
         reservationService.cancel_reservation(reservation_id, current_user)
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
