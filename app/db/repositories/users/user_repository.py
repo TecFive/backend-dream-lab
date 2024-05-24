@@ -1,9 +1,11 @@
 from typing import List
 
+from fastapi import HTTPException
+
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.users.user import User
-from app.db.models.persistence.users.user import UserPersistence
+from app.db.models.persistence.users.user_persistence import UserPersistence
 
 config = Settings()
 
@@ -31,7 +33,7 @@ class UserRepository:
 
             return users
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def get_all_users_by_career(self, career: str) -> List[User]:
         try:
@@ -53,7 +55,7 @@ class UserRepository:
 
             return users
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def get_all_users_by_semester(self, semester: int) -> List[User]:
         try:
@@ -75,7 +77,7 @@ class UserRepository:
 
             return users
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_user_by_id(self, user_id: str) -> User:
         try:
@@ -98,7 +100,7 @@ class UserRepository:
 
             return user
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_user_by_email(self, email: str) -> User:
         try:
@@ -121,7 +123,7 @@ class UserRepository:
 
             return user
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def create_user(self, user: User) -> None:
         try:
@@ -136,7 +138,7 @@ class UserRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def update_user(self, user: User) -> None:
         try:
@@ -151,7 +153,7 @@ class UserRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def delete_user(self, user_id: str) -> None:
         try:
@@ -164,4 +166,4 @@ class UserRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))

@@ -25,7 +25,7 @@ class EquipmentPersistence(BaseModel):
             id=equipment.id,
             name=equipment.name,
             description=equipment.description,
-            status=equipment.status.id,
+            status=equipment.status,
             reservation_id=equipment.reservation_id,
             image=equipment.image,
             created_at=equipment.created_at,

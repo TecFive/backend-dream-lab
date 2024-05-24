@@ -1,9 +1,11 @@
 from typing import List
 
+from fastapi import HTTPException
+
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.equipmentStatuses.equipment_status import EquipmentStatus
-from app.db.models.persistence.equipmentStatuses.equipment_status import EquipmentStatusPersistence
+from app.db.models.persistence.equipmentStatuses.equipment_status_persistence import EquipmentStatusPersistence
 
 config = Settings()
 
@@ -30,7 +32,7 @@ class EquipmentStatusRepository:
 
             return equipment_statuses
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_equipment_status_by_id(self, equipment_status_id: str) -> EquipmentStatus:
         try:
@@ -51,7 +53,7 @@ class EquipmentStatusRepository:
 
             return equipment_status
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_equipment_status_by_name(self, equipment_status_name: str) -> EquipmentStatus:
         try:
@@ -72,7 +74,7 @@ class EquipmentStatusRepository:
 
             return equipment_status
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def create_equipment_status(self, equipment_status: EquipmentStatus) -> None:
         try:
@@ -87,7 +89,7 @@ class EquipmentStatusRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def update_equipment_status(self, equipment_status: EquipmentStatus) -> None:
         try:
@@ -102,7 +104,7 @@ class EquipmentStatusRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def delete_equipment_status(self, equipment_status_id: str) -> None:
         try:
@@ -115,4 +117,4 @@ class EquipmentStatusRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))

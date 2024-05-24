@@ -4,7 +4,7 @@ from typing import Any, List
 from pydantic import BaseModel
 
 from app.db.models.application.equipments.equipment import Equipment
-from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
+from app.db.models.application.reservationStatus.reservation_status import ReservationStatus
 from app.db.models.application.rooms.room import Room
 from app.db.models.application.users.user import User
 

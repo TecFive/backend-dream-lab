@@ -1,7 +1,7 @@
 from typing import List
 
-from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
-from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
+from app.db.models.application.reservationStatus.reservation_status import ReservationStatus
+from app.db.repositories.reservationStatus.reservation_status_repository import ReservationStatusRepository
 
 
 class ReservationStatusService:

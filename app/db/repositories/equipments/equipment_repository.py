@@ -1,9 +1,11 @@
 from typing import List
 
+from fastapi import HTTPException
+
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.equipments.equipment import Equipment
-from app.db.models.persistence.equipments.equipment import EquipmentPersistence
+from app.db.models.persistence.equipments.equipment_persistence import EquipmentPersistence
 
 config = Settings()
 
@@ -65,7 +67,7 @@ class EquipmentRepository:
 
             return equipments
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def get_equipment_by_status(self, equipment_status: str) -> List[Equipment]:
         try:
@@ -106,7 +108,7 @@ class EquipmentRepository:
 
             return equipments
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def get_equipment_by_reservation_id(self, reservation_id: str) -> List[Equipment]:
         try:
@@ -147,7 +149,7 @@ class EquipmentRepository:
 
             return equipments
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_equipment_by_id(self, equipment_id: str) -> Equipment:
         try:
@@ -201,7 +203,7 @@ class EquipmentRepository:
 
             return equipment
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_equipment_by_name(self, equipment_name: str) -> Equipment:
         try:
@@ -240,7 +242,7 @@ class EquipmentRepository:
 
             return equipment
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def create_equipment(self, equipment: Equipment) -> None:
         try:
@@ -266,7 +268,7 @@ class EquipmentRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def update_equipment(self, equipment: Equipment) -> None:
         try:
@@ -274,7 +276,7 @@ class EquipmentRepository:
 
             cursor = self.database_client.get_conn()
 
-            query = f"UPDATE {config.ENVIRONMENT}.Equipment SET name = ?, description = ?, status = ?, image = ?, updated_at = CAST(? AS DATETIME2) WHERE id = ?"
+            query = f"UPDATE {config.ENVIRONMENT}.Equipment SET name = ?, description = ?, status = ?, image = ?, reservation_id = ?, updated_at = CAST(? AS DATETIME2) WHERE id = ?"
             cursor.execute(
                 query,
                 (
@@ -282,6 +284,7 @@ class EquipmentRepository:
                     equipment_persistence.description,
                     equipment_persistence.status,
                     equipment_persistence.image,
+                    equipment_persistence.reservation_id,
                     equipment_persistence.updated_at,
                     equipment_persistence.id
                 )
@@ -290,7 +293,7 @@ class EquipmentRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def delete_equipment(self, equipment_id: str) -> None:
         try:
@@ -302,4 +305,4 @@ class EquipmentRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))

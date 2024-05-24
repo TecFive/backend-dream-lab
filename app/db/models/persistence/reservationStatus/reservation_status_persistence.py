@@ -3,7 +3,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
+from app.db.models.application.reservationStatus.reservation_status import ReservationStatus
 
 
 class ReservationStatusPersistence(BaseModel):

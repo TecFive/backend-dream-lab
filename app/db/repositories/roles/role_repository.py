@@ -1,9 +1,11 @@
 from typing import List
 
+from fastapi import HTTPException
+
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.roles.role import Role
-from app.db.models.persistence.roles.role import RolePersistence
+from app.db.models.persistence.roles.role_persistence import RolePersistence
 
 config = Settings()
 
@@ -31,7 +33,7 @@ class RoleRepository:
 
             return roles
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_role_by_id(self, role_id: str) -> Role:
         try:
@@ -54,7 +56,7 @@ class RoleRepository:
 
             return role
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_role_by_name(self, role_name: str) -> Role:
         try:
@@ -77,7 +79,7 @@ class RoleRepository:
 
             return role
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def create_role(self, role: Role) -> None:
         try:
@@ -93,7 +95,7 @@ class RoleRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def update_role(self, role: Role) -> None:
         try:
@@ -109,7 +111,7 @@ class RoleRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def delete_role(self, role_id: str) -> None:
         try:
@@ -122,4 +124,4 @@ class RoleRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))

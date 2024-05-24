@@ -17,7 +17,7 @@ async def get_all_equipments():
 
         return {"data": equipments}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/id/{equipment_id}")
@@ -27,7 +27,7 @@ async def find_equipment_by_id(equipment_id: str):
 
         return {"data": equipment}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/status/{equipment_status}")
@@ -37,7 +37,7 @@ async def get_equipments_by_status(equipment_status: str):
 
         return {"data": equipments}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/reservation/{reservation_id}")
@@ -47,7 +47,7 @@ async def get_equipments_by_reservation_id(reservation_id: str):
 
         return {"data": equipment}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/name/{equipment_name}")
@@ -57,7 +57,7 @@ async def find_equipment_by_name(equipment_name: str):
 
         return {"data": equipment}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.post("/")
@@ -67,7 +67,7 @@ async def create_equipment(equipment_data: CreateEquipmentDto):
 
         return {"data": equipment}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.put("/")
@@ -77,7 +77,7 @@ async def update_equipment(equipment_data: UpdateEquipmentDto):
 
         return {"data": equipment}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.put("/update/image/{equipment_id}")
@@ -87,7 +87,7 @@ async def add_image_to_equipment(equipment_id: str, image_url: str):
 
         return {"data": "Image added to equipment successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.delete("/{equipment_id}")
@@ -97,4 +97,4 @@ async def delete_equipment(equipment_id: str):
 
         return {"data": "Equipment deleted successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise e

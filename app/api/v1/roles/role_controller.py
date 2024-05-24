@@ -17,7 +17,7 @@ async def get_all_roles():
 
         return {"data": roles}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/{role_id}")
@@ -27,7 +27,7 @@ async def find_role_by_id(role_id: str):
 
         return {"data": role}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/name/{role_name}")
@@ -37,7 +37,7 @@ async def find_role_by_name(role_name: str):
 
         return {"data": role}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.post("/")
@@ -47,7 +47,7 @@ async def create_role(create_role_dto: CreateRoleDto):
 
         return {"data": "Role created successfully."}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.put("/")
@@ -57,7 +57,7 @@ async def update_role(update_role_dto: UpdateRoleDto):
 
         return {"data": "Role updated successfully."}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.delete("/{role_id}")
@@ -67,4 +67,4 @@ async def delete_role(role_id: str):
 
         return {"data": "Role deleted successfully."}
     except Exception as e:
-        return {"error": str(e)}
+        raise e

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import bcrypt
+from fastapi import HTTPException
 from jose import jwt
 
 from app.core.config import Settings
@@ -27,37 +28,61 @@ class Security:
                 algorithm=config.JWT_ALGORITHM,
             )
         except Exception as e:
-            raise e
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )
 
     @staticmethod
     def hash_password(password: str) -> str:
         try:
             if password is None:
-                raise Exception("Password is required.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Password is required."
+                )
             elif len(password) < 8:
-                raise Exception("Password must be at least 8 characters long.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Password must be at least 8 characters long."
+                )
 
             password = password.encode("utf-8")
             hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
             return hashed_password.decode("utf-8")
         except Exception as e:
-            raise e
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )
 
     @staticmethod
     def verify_password(password: str, hashed_password: str) -> bool:
         try:
             if password is None:
-                raise Exception("Password is required.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Password is required."
+                )
             elif len(password) < 8:
-                raise Exception("Password must be at least 8 characters long.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Password must be at least 8 characters long."
+                )
 
             if hashed_password is None:
-                raise Exception("Hashed password is required.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Password is required."
+                )
 
             password = password.encode("utf-8")
             hashed_password = hashed_password.encode("utf-8")
 
             return bcrypt.checkpw(password, hashed_password)
         except Exception as e:
-            raise e
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )

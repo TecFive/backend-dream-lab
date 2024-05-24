@@ -36,7 +36,7 @@ async def login_for_access_token(password: str, email: str):
 
         return {"data": Security.generate_jwt_token(user)}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.post("/register")
@@ -46,7 +46,7 @@ async def register_user(create_user_dto: CreateUserDto):
 
         return {"data": user}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.post("/multi-register")
@@ -59,4 +59,4 @@ async def register_multiple_users(create_user_dtos: List[CreateUserDto]):
 
         return {"data": users}
     except Exception as e:
-        return {"error": str(e)}
+        raise e

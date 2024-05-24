@@ -1,9 +1,11 @@
 from typing import List
 
+from fastapi import HTTPException
+
 from app.core.config import Settings
 from app.db.client import DatabaseClient
-from app.db.models.application.reservationStatus.reservationStatus import ReservationStatus
-from app.db.models.persistence.reservationStatus.reservationStatus import ReservationStatusPersistence
+from app.db.models.application.reservationStatus.reservation_status import ReservationStatus
+from app.db.models.persistence.reservationStatus.reservation_status_persistence import ReservationStatusPersistence
 
 config = Settings()
 
@@ -31,7 +33,7 @@ class ReservationStatusRepository:
 
             return reservation_statuses
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_reservation_status_by_id(self, reservation_status_id: str) -> ReservationStatus:
         try:
@@ -54,7 +56,7 @@ class ReservationStatusRepository:
 
             return reservation_status
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_reservation_status_by_name(self, reservation_status_name: str) -> ReservationStatus:
         try:
@@ -77,7 +79,7 @@ class ReservationStatusRepository:
 
             return reservation_status
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def create_reservation_status(self, reservation_status: ReservationStatus) -> None:
         try:
@@ -92,7 +94,7 @@ class ReservationStatusRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def update_reservation_status(self, reservation_status: ReservationStatus) -> None:
         try:
@@ -107,7 +109,7 @@ class ReservationStatusRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def delete_reservation_status(self, reservation_status_id: str) -> None:
         try:
@@ -120,4 +122,4 @@ class ReservationStatusRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))

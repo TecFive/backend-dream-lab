@@ -1,12 +1,12 @@
-import base64
 from typing import List
+
+from fastapi import HTTPException
 
 from app.core.config import Settings
 from app.db.client import DatabaseClient
 from app.db.models.application.rooms.room import Room
-from app.db.models.persistence.rooms.room import RoomPersistence
+from app.db.models.persistence.rooms.room_persistence import RoomPersistence
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
-from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto
 
 config = Settings()
 
@@ -45,7 +45,7 @@ class RoomRepository:
 
             return rooms
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_room_by_id(self, room_id: str) -> Room:
         try:
@@ -75,7 +75,7 @@ class RoomRepository:
 
             return room
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def find_room_by_name(self, room_name: str) -> Room:
         try:
@@ -105,7 +105,7 @@ class RoomRepository:
 
             return room
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def create_room(self, room: Room) -> None:
         try:
@@ -132,7 +132,7 @@ class RoomRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def update_room(self, room: Room) -> None:
         try:
@@ -157,7 +157,7 @@ class RoomRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
     def delete_room(self, room_id: str) -> None:
         try:
@@ -170,4 +170,4 @@ class RoomRepository:
             self.database_client.commit()
             self.database_client.close()
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))

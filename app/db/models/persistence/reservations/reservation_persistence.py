@@ -27,12 +27,12 @@ class ReservationPersistence(BaseModel):
 
         return ReservationPersistence(
             id=reservation.id,
-            user_id=reservation.user_id,
-            room_id=reservation.room_id,
+            user_id=reservation.user.id,
+            room_id=reservation.room.id,
             start_date=reservation.start_date,
             end_date=reservation.end_date,
             reserved_equipment=reserved_equipment,
-            status=reservation.status,
+            status=reservation.status.id,
             comments=reservation.comments,
             created_at=reservation.created_at,
             updated_at=reservation.updated_at

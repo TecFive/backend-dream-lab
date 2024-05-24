@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 import bson
+from fastapi import HTTPException
 
 from app.core.security import Security
 from app.db.models.application.users.user import User
@@ -76,7 +77,7 @@ class UserService:
         user_found = self.find_user_by_id(update_user_dto.id)
 
         if user_found is None:
-            raise Exception("User could not be found")
+            raise HTTPException(status_code=404, detail="User not found")
 
         user_found.name = user_found.name
         user_found.email = user_found.email
@@ -93,10 +94,10 @@ class UserService:
         role_found = self.role_repository.find_role_by_id(update_user_role_dto.role_id)
 
         if user_found is None:
-            raise Exception("User could not be found")
+            raise HTTPException(status_code=404, detail="User not found")
 
         if role_found is None:
-            raise Exception("Role could not be found")
+            raise HTTPException(status_code=404, detail="Role not found")
 
         user_found.role = role_found.id
         user_found.priority = role_found.priority

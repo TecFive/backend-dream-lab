@@ -1,13 +1,12 @@
-import io
 from datetime import datetime
 from typing import List
 
 import bson
+from fastapi import HTTPException
 
 from app.db.models.application.rooms.room import Room
 from app.db.repositories.rooms.room_repository import RoomRepository
 from app.dtos.rooms.create_room_dto import CreateRoomDto
-from app.dtos.rooms.get_all_rooms_dto import GetAllRoomsDto
 from app.dtos.rooms.update_room_dto import UpdateRoomDto
 from app.services.equipments.equipment_service import EquipmentService
 
@@ -57,7 +56,7 @@ class RoomService:
     def update_room(self, room_dto: UpdateRoomDto) -> None:
         room_found = self.room_repository.find_room_by_id(room_dto.id)
         if room_found is None:
-            raise Exception("Room not found.")
+            raise HTTPException(status_code=404, detail="Room not found")
 
         if room_dto.name is not None:
             room_found.name = room_dto.name
@@ -86,7 +85,7 @@ class RoomService:
     def add_image_to_room(self, room_id: str, image_url: str) -> None:
         room_found = self.room_repository.find_room_by_id(room_id)
         if room_found is None:
-            raise Exception("Room not found.")
+            raise HTTPException(status_code=404, detail="Room not found")
 
         room_found.image = image_url
         room_found.updated_at = datetime.now().isoformat()

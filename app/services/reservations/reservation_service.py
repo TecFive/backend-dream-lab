@@ -2,17 +2,16 @@ from datetime import datetime
 from typing import List
 
 import bson
+from fastapi import HTTPException
 
 from app.db.models.application.reservations.reservation import Reservation
 from app.db.models.application.users.user import User
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
 from app.db.repositories.equipments.equipment_repository import EquipmentRepository
-from app.db.repositories.reservationStatus.reservation_status_repositories import ReservationStatusRepository
+from app.db.repositories.reservationStatus.reservation_status_repository import ReservationStatusRepository
 from app.db.repositories.reservations.reservation_repository import ReservationRepository
 from app.db.repositories.rooms.room_repository import RoomRepository
 from app.dtos.reservations.create_reservation_dto import CreateReservationDto
-from app.dtos.reservations.get_my_reservations_dto import GetMyReservationsDto
-from app.dtos.reservations.reservation_equipment_detail_dto import ReservationEquipmentDetailDto
 from app.dtos.reservations.update_reservation_dto import UpdateReservationDto
 
 
@@ -48,6 +47,9 @@ class ReservationService:
     def get_reservation_by_id(self, reservation_id: str) -> Reservation:
         reservation = self.reservation_repository.find_reservation_by_id(reservation_id)
 
+        if not reservation:
+            raise HTTPException(status_code=404, detail="Reservation could not be found")
+
         return reservation
 
     def get_available_hours(self, date: str) -> List[datetime]:
@@ -55,27 +57,35 @@ class ReservationService:
 
         return available_hours
 
-    def create_reservation(self, reservation: CreateReservationDto, user: User) -> None:
+    def create_reservation(self, reservation: CreateReservationDto, current_user: User) -> None:
+        if len(reservation.reserved_equipment) == 0 or reservation.reserved_equipment is None or reservation.reserved_equipment[0] is None or reservation.reserved_equipment[0] == "":
+            raise HTTPException(status_code=400, detail="Equipment is required")
+
         status_found = self.reservation_status_repository.find_reservation_status_by_name("Approved")
         if not status_found:
-            raise Exception("Reservation status could not be found")
+            raise HTTPException(status_code=404, detail="Reservation status could not be found")
+
+        room_found = self.room_repository.find_room_by_id(reservation.room_id)
+        if not room_found:
+            raise HTTPException(status_code=404, detail="Room could not be found")
 
         reservation_id = str(bson.ObjectId())
+        reserved_equipment = []
         for equipment in reservation.reserved_equipment:
             equipment_found = self.equipment_repository.find_equipment_by_id(equipment)
             if not equipment_found:
-                raise Exception("Equipment could not be found")
+                raise HTTPException(status_code=404, detail="Equipment could not be found")
 
             in_use_equipment_status_found = self.equipment_status_repository.find_equipment_status_by_name("In Use")
             available_equipment_status_found = self.equipment_status_repository.find_equipment_status_by_name("Available")
             if not in_use_equipment_status_found:
-                raise Exception("Equipment status 'In Use' could not be found")
+                raise HTTPException(status_code=404, detail="Equipment status 'In Use' could not be found")
 
             if not available_equipment_status_found:
-                raise Exception("Equipment status 'Available' could not be found")
+                raise HTTPException(status_code=404, detail="Equipment status 'Available' could not be found")
 
-            if equipment_found.status != available_equipment_status_found.id:
-                raise Exception("Equipment is not available")
+            # if equipment_found.status != available_equipment_status_found.id:
+                # raise HTTPException(status_code=400, detail="Equipment is not available")
 
             equipment_found.status = in_use_equipment_status_found.id
             equipment_found.reservation_id = reservation_id
@@ -83,14 +93,16 @@ class ReservationService:
 
             self.equipment_repository.update_equipment(equipment_found)
 
+            reserved_equipment.append(equipment_found)
+
         new_reservation = Reservation(
             id=reservation_id,
-            user_id=user.id,
-            room_id=reservation.room_id,
+            user=current_user,
+            room=room_found,
             start_date=reservation.start_date,
             end_date=reservation.end_date,
-            reserved_equipment=reservation.reserved_equipment,
-            status=status_found.id,
+            reserved_equipment=reserved_equipment,
+            status=status_found,
             comments=reservation.comments,
             created_at=datetime.now().isoformat(),
             updated_at=datetime.now().isoformat(),
@@ -101,10 +113,10 @@ class ReservationService:
     def update_reservation(self, update_reservation_dto: UpdateReservationDto, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(update_reservation_dto.reservation_id)
         if not reservation_found:
-            raise Exception("Reservation could not be found")
+            raise HTTPException(status_code=404, detail="Reservation could not be found")
 
         if reservation_found.user_id != user.id:
-            raise Exception("You are not allowed to update this reservation")
+            raise HTTPException(status_code=403, detail="You are not allowed to update this reservation")
 
         reservation_found.start_date = update_reservation_dto.start_date
         reservation_found.end_date = update_reservation_dto.end_date
@@ -117,18 +129,18 @@ class ReservationService:
     def cancel_reservation(self, reservation_id: str, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(reservation_id)
         if not reservation_found:
-            raise Exception("Reservation could not be found")
+            raise HTTPException(status_code=404, detail="Reservation could not be found")
 
         if reservation_found.user_id != user.id:
-            raise Exception("You are not allowed to delete this reservation")
+            raise HTTPException(status_code=403, detail="You are not allowed to cancel this reservation")
 
-        status_found = self.reservation_status_repository.find_reservation_status_by_id(reservation_found.status)
+        status_found = self.reservation_status_repository.find_reservation_status_by_id(reservation_found.status.id)
         if not status_found:
-            raise Exception("Current reservation status could not be found")
+            raise HTTPException(status_code=404, detail="Reservation status could not be found")
 
         cancelled_status = self.reservation_status_repository.find_reservation_status_by_name("Cancelled")
         if not cancelled_status:
-            raise Exception("Canceled reservation status could not be found")
+            raise HTTPException(status_code=404, detail="Reservation status 'Cancelled' could not be found")
 
         reservation_found.status = cancelled_status.id
 

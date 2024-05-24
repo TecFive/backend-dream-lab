@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter
 
 from app.core.config import Settings
 from app.dtos.rooms.create_room_dto import CreateRoomDto
@@ -18,7 +18,7 @@ async def get_all_rooms():
 
         return {"data": rooms}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/id/{room_id}")
@@ -28,7 +28,7 @@ async def find_room_by_id(room_id: str):
 
         return {"data": room}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.get("/name/{room_name}")
@@ -38,7 +38,7 @@ async def find_room_by_name(room_name: str):
 
         return {"data": room}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.post("/")
@@ -48,7 +48,7 @@ async def create_room(create_room_dto: CreateRoomDto):
 
         return {"data": "Room created successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.put("/")
@@ -58,7 +58,7 @@ async def update_room(update_room_dto: UpdateRoomDto):
 
         return {"data": "Room updated successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.put("/update/image/{room_id}")
@@ -68,7 +68,7 @@ async def add_image_to_room(room_id: str, image_url: str):
 
         return {"data": "Image added to room successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise e
 
 
 @router.delete("/{room_id}")
@@ -78,4 +78,4 @@ async def delete_room(room_id: str):
 
         return {"data": "Room deleted successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise e

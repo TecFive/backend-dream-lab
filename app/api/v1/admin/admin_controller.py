@@ -12,11 +12,41 @@ router = APIRouter()
 adminService = AdminService()
 
 
-@router.get("/reservations/{start_date}/{end_date}")
+@router.get("/reservations/selector/{start_date}/{end_date}")
 async def get_reservations(start_date: datetime, end_date: datetime, current_user: User = Depends(has_admin_access)):
     try:
         reservations = await adminService.get_reservations_between_dates(start_date, end_date)
 
         return reservations
     except Exception as e:
-        return {"error": str(e)}
+        raise e
+
+
+@router.get("/reservations/stats/daily")
+async def get_daily_reservations(current_user: User = Depends(has_admin_access)):
+    try:
+        reservations = await adminService.get_daily_reservations()
+
+        return reservations
+    except Exception as e:
+        raise e
+
+
+@router.get("/reservations/stats/weekly")
+async def get_all_time_reservations(current_user: User = Depends(has_admin_access)):
+    try:
+        reservations = await adminService.get_weekly_reservations()
+
+        return reservations
+    except Exception as e:
+        raise e
+
+
+@router.get("/reservations/stats/all-time")
+async def get_all_time_reservations(current_user: User = Depends(has_admin_access)):
+    try:
+        reservations = await adminService.get_all_time_reservations()
+
+        return reservations
+    except Exception as e:
+        raise e

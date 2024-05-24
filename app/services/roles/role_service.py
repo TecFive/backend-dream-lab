@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List
 
+from fastapi import HTTPException
+
 from app.db.models.application.roles.role import Role
 from app.db.repositories.roles.role_repository import RoleRepository
 from app.dtos.roles.create_role_dto import CreateRoleDto
@@ -48,7 +50,7 @@ class RoleService:
         role_found = self.role_repository.find_role_by_id(role.id)
 
         if role_found is None:
-            raise Exception("Role not found.")
+            raise HTTPException(status_code=404, detail="Role not found.")
 
         role_found.name = role.name
         role_found.description = role.description
@@ -62,6 +64,6 @@ class RoleService:
         role_found = self.role_repository.find_role_by_id(role_id)
 
         if role_found is None:
-            raise Exception("Role not found.")
+            raise HTTPException(status_code=404, detail="Role not found.")
 
         self.role_repository.delete_role(role_id)
