@@ -1,14 +1,21 @@
 from datetime import datetime, timedelta
 
 from app.db.repositories.admin.admin_repository import AdminRepository
+from app.services.equipments.equipment_service import EquipmentService
 from app.services.reservationStatuses.reservation_status_service import ReservationStatusService
+from app.services.rooms.room_service import RoomService
 
 
 class AdminService:
-    admin_repository = AdminRepository()
-    reservation_status_service = ReservationStatusService()
+    reservation_status_service: ReservationStatusService
+    room_service: RoomService
+    equipment_service: EquipmentService
+    admin_repository: AdminRepository
 
     def __init__(self):
+        self.reservation_status_service = ReservationStatusService()
+        self.room_service = RoomService()
+        self.equipment_service = EquipmentService()
         self.admin_repository = AdminRepository()
 
     async def get_reservations_between_dates(self, start_date: datetime, end_date: datetime):
@@ -88,11 +95,12 @@ class AdminService:
         reservations = self.admin_repository.get_all_reservations(filter_params)
 
         room_stats = {}
+        all_rooms = self.room_service.get_all_rooms()
+        for room in all_rooms:
+            room_stats[room.name] = 0
+
         for reservation in reservations:
-            if reservation.room.name not in room_stats:
-                room_stats[reservation.room.name] = 1
-            else:
-                room_stats[reservation.room.name] += 1
+            room_stats[reservation.room.name] += 1
 
         return room_stats
 
@@ -104,11 +112,12 @@ class AdminService:
         reservations = self.admin_repository.get_all_reservations(filter_params)
 
         equipment_stats = {}
+        all_equipment = self.equipment_service.get_equipments()
+        for equipment in all_equipment:
+            equipment_stats[equipment.name] = 0
+
         for reservation in reservations:
             for equipment in reservation.reserved_equipment:
-                if equipment.name not in equipment_stats:
-                    equipment_stats[equipment.name] = 1
-                else:
-                    equipment_stats[equipment.name] += 1
+                equipment_stats[equipment.name] += 1
 
         return equipment_stats
