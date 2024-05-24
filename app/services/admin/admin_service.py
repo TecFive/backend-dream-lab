@@ -79,3 +79,36 @@ class AdminService:
             "pending": len(pending_reservations),
             "completed": len(completed_reservations)
         }
+
+    async def get_weekly_reserved_rooms(self):
+        today = datetime.utcnow()
+        today_temp = today - timedelta(days=7)
+
+        filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2)"
+        reservations = self.admin_repository.get_all_reservations(filter_params)
+
+        room_stats = {}
+        for reservation in reservations:
+            if reservation.room.name not in room_stats:
+                room_stats[reservation.room.name] = 1
+            else:
+                room_stats[reservation.room.name] += 1
+
+        return room_stats
+
+    async def get_weekly_reserved_equipment(self):
+        today = datetime.utcnow()
+        today_temp = today - timedelta(days=7)
+
+        filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2)"
+        reservations = self.admin_repository.get_all_reservations(filter_params)
+
+        equipment_stats = {}
+        for reservation in reservations:
+            for equipment in reservation.reserved_equipment:
+                if equipment.name not in equipment_stats:
+                    equipment_stats[equipment.name] = 1
+                else:
+                    equipment_stats[equipment.name] += 1
+
+        return equipment_stats
