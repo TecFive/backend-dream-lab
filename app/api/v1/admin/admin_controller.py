@@ -16,7 +16,6 @@ adminService = AdminService()
 async def get_reservations(start_date: datetime, end_date: datetime, current_user: User = Depends(has_admin_access)):
     try:
         reservations = await adminService.get_reservations_between_dates(start_date, end_date)
-
         return reservations
     except Exception as e:
         raise e
