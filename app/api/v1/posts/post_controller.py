@@ -52,6 +52,16 @@ async def update_post(post_dto: UpdatePostDto, post_id: str, current_user: User 
         raise e
 
 
+@router.put("/{post_id}/visibility")
+async def update_post_visibility(post_id: str, visibility: bool, current_user: User = Depends(get_current_user)):
+    try:
+        post = post_service.change_visibility(post_id, visibility, current_user)
+
+        return {"data": post}
+    except Exception as e:
+        raise e
+
+
 @router.delete("/{post_id}")
 async def delete_post(post_id: str):
     try:

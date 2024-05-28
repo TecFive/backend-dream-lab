@@ -7,3 +7,4 @@ class UpdatePostDto(BaseModel):
     file: Optional[str]
     title: Optional[str]
     description: Optional[str]
+    visible: Optional[bool]
