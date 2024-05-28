@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     AZURE_DATABASE_USER: str = os.getenv("AZURE_DATABASE_USER")
     AZURE_DATABASE_PASSWORD: str = os.getenv("AZURE_DATABASE_PASSWORD")
     AZURE_DATABASE_DRIVER: str = os.getenv("AZURE_DATABASE_DRIVER")
+    MONGO_URI: str = os.getenv("MONGO_URI")
+    MONGO_DB: str = os.getenv("MONGO_DB")
 
     @staticmethod
     def get_current_time():

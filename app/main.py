@@ -2,6 +2,8 @@ from app.api.v1.admin import admin_controller
 from app.api.v1.auth import auth_controller
 from app.api.v1.equipment_statuses import equipment_status_controller
 from app.api.v1.equipments import equipment_controller
+from app.api.v1.postTypes import post_type_controller
+from app.api.v1.posts import post_controller
 from app.api.v1.reservations import reservation_controller
 from app.api.v1.rooms import room_controller
 from app.api.v1.users import user_controller
@@ -15,7 +17,7 @@ from fastapi.openapi.docs import (
     get_swagger_ui_oauth2_redirect_html,
 )
 
-from app.dependency import has_jwt_access
+from app.dependency import has_jwt_access, has_admin_access
 
 WORKING_CDN = "unpkg.com"
 
@@ -57,6 +59,7 @@ async def redoc_html():
     )
 
 PROTECTED = [Depends(has_jwt_access)]
+PROTECTED_ADMIN = [Depends(has_admin_access)]
 
 app.include_router(
     auth_controller.router,
@@ -76,7 +79,7 @@ app.include_router(
     admin_controller.router,
     prefix="/v1/admin",
     tags=["admin"],
-    dependencies=PROTECTED
+    dependencies=PROTECTED_ADMIN
 )
 
 app.include_router(
@@ -105,4 +108,18 @@ app.include_router(
     prefix="/v1/rooms",
     tags=["rooms"],
     dependencies=PROTECTED
+)
+
+app.include_router(
+    post_controller.router,
+    prefix="/v1/posts",
+    tags=["posts"],
+    dependencies=PROTECTED_ADMIN
+)
+
+app.include_router(
+    post_type_controller.router,
+    prefix="/v1/post-types",
+    tags=["post-types"],
+    dependencies=PROTECTED_ADMIN
 )

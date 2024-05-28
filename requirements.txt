@@ -10,3 +10,4 @@ uvicorn
 gunicorn
 python-jose
 python-multipart
+pymongo~=4.7.2
