@@ -12,6 +12,7 @@ class PostPersistence(BaseModel):
     file: str
     title: str
     description: Optional[str] = None
+    visible: bool
     createdBy: PyObjectId
     createdAt: str
     updatedBy: PyObjectId
@@ -28,6 +29,7 @@ class PostPersistence(BaseModel):
             file=post.file,
             title=post.title,
             description=post.description,
+            visible=post.visible,
             createdBy=post.createdBy,
             createdAt=post.createdAt,
             updatedBy=post.updatedBy,

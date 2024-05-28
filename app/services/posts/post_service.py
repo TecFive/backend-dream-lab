@@ -41,6 +41,7 @@ class PostService:
             file=post_dto.file,
             title=post_dto.title,
             description=post_dto.description,
+            visible=True,
             createdBy=current_user.id,
             createdAt=datetime.now().isoformat(),
             updatedBy=current_user.id,
@@ -66,8 +67,24 @@ class PostService:
         if post_dto.description is not None:
             post.description = post_dto.description
 
+        if post_dto.visible is not None:
+            post.visible = post_dto.visible
+
         post.updatedBy = current_user.id
         post.updatedAt = post_dto.updatedAt
+
+        self.post_repository.update(post)
+
+        return post
+
+    def change_visibility(self, post_id: str, visible: bool, current_user: User) -> Post:
+        post = self.post_repository.find_by_id(PyObjectId(post_id))
+        if post is None:
+            raise HTTPException(status_code=404, detail="Post not found")
+
+        post.visible = visible
+        post.updatedBy = current_user.id
+        post.updatedAt = datetime.now().isoformat()
 
         self.post_repository.update(post)
 

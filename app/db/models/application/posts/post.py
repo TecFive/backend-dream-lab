@@ -11,6 +11,7 @@ class Post(BaseModel):
     file: str
     title: str
     description: Optional[str] = None
+    visible: bool
     createdBy: PyObjectId
     createdAt: str
     updatedBy: PyObjectId
@@ -27,6 +28,7 @@ class Post(BaseModel):
             file=post_persistence["file"],
             title=post_persistence["title"],
             description=post_persistence["description"],
+            visible=post_persistence["visible"],
             createdBy=PyObjectId(post_persistence["createdBy"]),
             createdAt=post_persistence["createdAt"],
             updatedBy=PyObjectId(post_persistence["updatedBy"]),
