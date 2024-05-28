@@ -39,6 +39,8 @@ jobs:
           envkey_AZURE_DATABASE_USER: "${{ secrets.AZURE_DATABASE_USER }}"
           envkey_AZURE_DATABASE_PASSWORD: "${{ secrets.AZURE_DATABASE_PASSWORD }}"
           envkey_AZURE_DATABASE_DRIVER: "${{ secrets.AZURE_DATABASE_DRIVER }}"
+          envKey_MONGO_URI: "${{ secrets.MONGO_URI }}"
+          envKey_MONGO_DB: "${{ secrets.MONGO_DB }}"
           file_name: .env
           directory: app
       
