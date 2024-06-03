@@ -69,3 +69,13 @@ async def get_weekly_reserved_equipment(current_user: User = Depends(has_admin_a
         return equipment_stats
     except Exception as e:
         raise e
+
+
+@router.get("/reservations/stats/monthly")
+async def get_monthly_reserved_rooms(current_user: User = Depends(has_admin_access)):
+    try:
+        room_stats = await adminService.get_monthly_reserved_rooms()
+
+        return room_stats
+    except Exception as e:
+        raise e

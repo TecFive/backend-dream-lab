@@ -26,7 +26,7 @@ class AdminService:
 
     async def get_daily_reservations(self):
         today = datetime.utcnow()
-        today_temp = today - timedelta(days=1)
+        today_temp = today + timedelta(days=1)
 
         approved_status = self.reservation_status_service.get_reservation_status_by_name("Approved")
         pending_status = self.reservation_status_service.get_reservation_status_by_name("Pending")
@@ -48,7 +48,7 @@ class AdminService:
 
     async def get_weekly_reservations(self):
         today = datetime.utcnow()
-        today_temp = today - timedelta(days=7)
+        today_temp = today + timedelta(days=7)
 
         approved_status = self.reservation_status_service.get_reservation_status_by_name("Approved")
         pending_status = self.reservation_status_service.get_reservation_status_by_name("Pending")
@@ -89,7 +89,7 @@ class AdminService:
 
     async def get_weekly_reserved_rooms(self):
         today = datetime.utcnow()
-        today_temp = today - timedelta(days=7)
+        today_temp = today + timedelta(days=7)
 
         filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2)"
         reservations = self.admin_repository.get_all_reservations(filter_params)
@@ -106,7 +106,7 @@ class AdminService:
 
     async def get_weekly_reserved_equipment(self):
         today = datetime.utcnow()
-        today_temp = today - timedelta(days=7)
+        today_temp = today + timedelta(days=7)
 
         filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2)"
         reservations = self.admin_repository.get_all_reservations(filter_params)
@@ -121,3 +121,33 @@ class AdminService:
                 equipment_stats[equipment.name] += 1
 
         return equipment_stats
+    
+    async def get_monthly_reserved_rooms(self):
+        # Get the current date
+        current_date = datetime.now()
+
+        # Calculate the start date of the current month
+        start_date = current_date.replace(day=1)
+
+        # Calculate the end date of the current month
+        # First, get the start of the next month
+        if current_date.month == 12:
+            next_month_start = current_date.replace(year=current_date.year + 1, month=1, day=1)
+        else:
+            next_month_start = current_date.replace(month=current_date.month + 1, day=1)
+
+        # The end date of the current month is one day before the start of the next month
+        end_date = next_month_start - timedelta(days=1)
+
+        filter_params = f"WHERE r.start_date >= CAST('{start_date}' AS DATETIME2) AND r.start_date <= CAST('{end_date}' AS DATETIME2)"
+        reservations = self.admin_repository.get_all_reservations(filter_params)
+
+        room_stats = {}
+        all_rooms = self.room_service.get_all_rooms()
+        for room in all_rooms:
+            room_stats[room.name] = 0
+
+        for reservation in reservations:
+            room_stats[reservation.room.name] += 1
+
+        return room_stats
