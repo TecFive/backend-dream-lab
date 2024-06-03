@@ -87,6 +87,26 @@ class AdminService:
             "completed": len(completed_reservations)
         }
 
+    async def get_reservations_per_month(self):
+        year = datetime.utcnow().year
+        month = 1
+
+        reservations_per_month = {}
+
+        while month <= 12:
+            month_temp = month + 1
+            if month_temp == 13:
+                month_temp = 1
+                year += 1
+
+            filter_params = f"WHERE r.start_date >= CAST('{year}-{month}-01' AS DATETIME2) AND r.end_date <= CAST('{year}-{month_temp}-01' AS DATETIME2)"
+            reservations = self.admin_repository.get_all_reservations(filter_params)
+            reservations_per_month[month] = len(reservations)
+
+            month += 1
+
+        return reservations_per_month
+
     async def get_weekly_reserved_rooms(self):
         today = datetime.utcnow()
         today_temp = today + timedelta(days=7)
