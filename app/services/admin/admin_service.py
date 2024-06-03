@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from calendar import monthrange
 
 from app.db.repositories.admin.admin_repository import AdminRepository
 from app.services.equipments.equipment_service import EquipmentService
@@ -141,7 +142,7 @@ class AdminService:
                 equipment_stats[equipment.name] += 1
 
         return equipment_stats
-    
+
     async def get_monthly_reserved_rooms(self):
         # Get the current date
         current_date = datetime.now()
@@ -171,3 +172,54 @@ class AdminService:
             room_stats[reservation.room.name] += 1
 
         return room_stats
+
+    async def get_equipment_stats_per_month(self):
+        year = datetime.utcnow().year
+        month = 1
+
+        equipment_stats_per_month = {}
+
+        while month <= 12:
+            month_temp = month + 1
+            if month_temp == 13:
+                month_temp = 1
+                year += 1
+
+            filter_params = f"WHERE r.start_date >= CAST('{year}-{month}-01' AS DATETIME2) AND r.end_date <= CAST('{year}-{month_temp}-01' AS DATETIME2)"
+            reservations = self.admin_repository.get_all_reservations(filter_params)
+
+            equipment_stats = {}
+            all_equipment = self.equipment_service.get_equipments()
+            for equipment in all_equipment:
+                equipment_stats[equipment.name] = 0
+
+            for reservation in reservations:
+                for equipment in reservation.reserved_equipment:
+                    equipment_stats[equipment.name] += 1
+
+            equipment_stats_per_month[month] = equipment_stats
+
+            month += 1
+
+        return equipment_stats_per_month
+
+    async def get_equipment_stats_monthly(self):
+        year = datetime.utcnow().year
+        month = datetime.utcnow().month
+        max_day_of_month = monthrange(year, month)[1]
+
+        equipment_stats = {}
+        all_equipment = self.equipment_service.get_equipments()
+
+        for equipment in all_equipment:
+            equipment_stats[equipment.name] = 0
+
+        filter_params = f"WHERE r.start_date >= CAST('{year}-{month}-01' AS DATETIME2) AND r.end_date <= CAST('{year}-{month}-{max_day_of_month}' AS DATETIME2)"
+        reservations = self.admin_repository.get_all_reservations(filter_params)
+
+        for reservation in reservations:
+            for equipment in reservation.reserved_equipment:
+                equipment_stats[equipment.name] += 1
+
+        return equipment_stats
+
