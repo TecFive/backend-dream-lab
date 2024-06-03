@@ -11,7 +11,15 @@ class DatabaseClient:
     connection: Optional[pyodbc.Connection] = None
 
     def __init__(self):
-        self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
+        while self.connection is None:
+            try:
+                self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
+            except pyodbc.OperationalError as e:
+                print(e)
+                print("Cannot connect to SQL server")
+            except Exception as e:
+                print(e)
+                print("Cannot connect to SQL server")
 
     def get_conn(self) -> pyodbc.Cursor:
         try:
