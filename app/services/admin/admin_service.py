@@ -188,16 +188,11 @@ class AdminService:
             filter_params = f"WHERE r.start_date >= CAST('{year}-{month}-01' AS DATETIME2) AND r.end_date <= CAST('{year}-{month_temp}-01' AS DATETIME2)"
             reservations = self.admin_repository.get_all_reservations(filter_params)
 
-            equipment_stats = {}
-            all_equipment = self.equipment_service.get_equipments()
-            for equipment in all_equipment:
-                equipment_stats[equipment.name] = 0
-
+            equipment_counter = 0
             for reservation in reservations:
-                for equipment in reservation.reserved_equipment:
-                    equipment_stats[equipment.name] += 1
+                equipment_counter += len(reservation.reserved_equipment)
 
-            equipment_stats_per_month[month] = equipment_stats
+            equipment_stats_per_month[month] = equipment_counter
 
             month += 1
 
