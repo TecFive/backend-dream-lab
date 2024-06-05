@@ -71,7 +71,7 @@ class PostService:
             post.visible = post_dto.visible
 
         post.updatedBy = current_user.id
-        post.updatedAt = post_dto.updatedAt
+        post.updatedAt = datetime.utcnow().isoformat()
 
         self.post_repository.update(post)
 
