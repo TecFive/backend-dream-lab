@@ -131,9 +131,6 @@ class ReservationService:
         if not reservation_found:
             raise HTTPException(status_code=404, detail="Reservation could not be found")
 
-        if reservation_found.user.id != user.id:
-            raise HTTPException(status_code=403, detail="You are not allowed to cancel this reservation")
-
         status_found = self.reservation_status_repository.find_reservation_status_by_id(reservation_found.status.id)
         if not status_found:
             raise HTTPException(status_code=404, detail="Reservation status could not be found")
