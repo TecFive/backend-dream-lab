@@ -13,9 +13,9 @@ reservationService = ReservationService()
 
 
 @router.get("/")
-async def get_all_reservations():
+async def get_all_reservations(show_past_reservations: bool):
     try:
-        reservations = reservationService.get_all_reservations()
+        reservations = reservationService.get_all_reservations(show_past_reservations)
 
         return {"data": reservations}
     except Exception as e:
@@ -23,9 +23,9 @@ async def get_all_reservations():
 
 
 @router.get("/my-reservations")
-async def get_my_reservations(current_user: User = Depends(get_current_user)):
+async def get_my_reservations(show_past_reservations: bool, current_user: User = Depends(get_current_user)):
     try:
-        reservations = reservationService.get_reservations_by_user_id(current_user.id)
+        reservations = reservationService.get_reservations_by_user_id(show_past_reservations, current_user.id)
 
         return {"data": reservations}
     except Exception as e:

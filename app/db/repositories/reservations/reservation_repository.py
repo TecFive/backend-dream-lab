@@ -21,38 +21,70 @@ class ReservationRepository:
     room_repository: RoomRepository = RoomRepository()
     equipment_repository: EquipmentRepository = EquipmentRepository()
 
-    def get_all_reservations(self) -> List[Reservation]:
+    def get_all_reservations(self, show_past_reservations: bool) -> List[Reservation]:
         try:
             cursor = self.database_client.get_conn()
 
-            query = f"""
-                SELECT
-                    r.id AS id,
-                    u.id AS user_id,
-                    u.name AS user_name,
-                    u.email AS user_email,
-                    u.password AS user_password,
-                    u.career AS user_career,
-                    u.semester AS user_semester,
-                    u.role AS user_role,
-                    u.priority AS user_priority,
-                    u.created_at AS user_created_at,
-                    u.updated_at AS user_updated_at,
-                    r.room_id AS room_id,
-                    r.start_date AS start_date,
-                    r.end_date AS end_date,
-                    r.reserved_equipment AS reserved_equipment,
-                    rs.id AS status_id,
-                    rs.name AS status_name,
-                    rs.description AS status_description,
-                    rs.created_at AS status_created_at,
-                    rs.updated_at AS status_updated_at,
-                    r.comments AS comments,
-                    r.created_at AS created_at,
-                    r.updated_at AS updated_at
-                FROM {config.ENVIRONMENT}.Reservations AS r
-                    INNER JOIN {config.ENVIRONMENT}.Users AS u ON u.id = r.user_id
-                    INNER JOIN {config.ENVIRONMENT}.ReservationStatus AS rs ON rs.id = r.status"""
+            if show_past_reservations:
+                query = f"""
+                    SELECT
+                        r.id AS id,
+                        u.id AS user_id,
+                        u.name AS user_name,
+                        u.email AS user_email,
+                        u.password AS user_password,
+                        u.career AS user_career,
+                        u.semester AS user_semester,
+                        u.role AS user_role,
+                        u.priority AS user_priority,
+                        u.created_at AS user_created_at,
+                        u.updated_at AS user_updated_at,
+                        r.room_id AS room_id,
+                        r.start_date AS start_date,
+                        r.end_date AS end_date,
+                        r.reserved_equipment AS reserved_equipment,
+                        rs.id AS status_id,
+                        rs.name AS status_name,
+                        rs.description AS status_description,
+                        rs.created_at AS status_created_at,
+                        rs.updated_at AS status_updated_at,
+                        r.comments AS comments,
+                        r.created_at AS created_at,
+                        r.updated_at AS updated_at
+                    FROM {config.ENVIRONMENT}.Reservations AS r
+                        INNER JOIN {config.ENVIRONMENT}.Users AS u ON u.id = r.user_id
+                        INNER JOIN {config.ENVIRONMENT}.ReservationStatus AS rs ON rs.id = r.status"""
+            else:
+                query = f"""
+                    SELECT
+                        r.id AS id,
+                        u.id AS user_id,
+                        u.name AS user_name,
+                        u.email AS user_email,
+                        u.password AS user_password,
+                        u.career AS user_career,
+                        u.semester AS user_semester,
+                        u.role AS user_role,
+                        u.priority AS user_priority,
+                        u.created_at AS user_created_at,
+                        u.updated_at AS user_updated_at,
+                        r.room_id AS room_id,
+                        r.start_date AS start_date,
+                        r.end_date AS end_date,
+                        r.reserved_equipment AS reserved_equipment,
+                        rs.id AS status_id,
+                        rs.name AS status_name,
+                        rs.description AS status_description,
+                        rs.created_at AS status_created_at,
+                        rs.updated_at AS status_updated_at,
+                        r.comments AS comments,
+                        r.created_at AS created_at,
+                        r.updated_at AS updated_at
+                    FROM {config.ENVIRONMENT}.Reservations AS r
+                        INNER JOIN {config.ENVIRONMENT}.Users AS u ON u.id = r.user_id
+                        INNER JOIN {config.ENVIRONMENT}.ReservationStatus AS rs ON rs.id = r.status
+                    WHERE start_date >= CAST(GETDATE() AS DATETIME2)"""
+
             cursor.execute(query)
 
             rows = cursor.fetchall()
@@ -201,7 +233,7 @@ class ReservationRepository:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    def get_reservations_by_user_id(self, user_id: str) -> List[Reservation]:
+    def get_reservations_by_user_id(self, show_past_reservations: bool, user_id: str) -> List[Reservation]:
         try:
             cursor = self.database_client.get_conn()
 
@@ -209,35 +241,67 @@ class ReservationRepository:
             if cancelled_status is None:
                 raise HTTPException(status_code=404, detail="Reservation status 'Cancelled' could not be found")
 
-            query = f"""
-                SELECT
-                    r.id AS id,
-                    u.id AS user_id,
-                    u.name AS user_name,
-                    u.email AS user_email,
-                    u.password AS user_password,
-                    u.career AS user_career,
-                    u.semester AS user_semester,
-                    u.role AS user_role,
-                    u.priority AS user_priority,
-                    u.created_at AS user_created_at,
-                    u.updated_at AS user_updated_at,
-                    r.room_id AS room_id,
-                    r.start_date AS start_date,
-                    r.end_date AS end_date,
-                    r.reserved_equipment AS reserved_equipment,
-                    rs.id AS status_id,
-                    rs.name AS status_name,
-                    rs.description AS status_description,
-                    rs.created_at AS status_created_at,
-                    rs.updated_at AS status_updated_at,
-                    r.comments AS comments,
-                    r.created_at AS created_at,
-                    r.updated_at AS updated_at
-                FROM {config.ENVIRONMENT}.Reservations AS r
-                    INNER JOIN {config.ENVIRONMENT}.Users AS u ON u.id = r.user_id
-                    INNER JOIN {config.ENVIRONMENT}.ReservationStatus AS rs ON rs.id = r.status
-                WHERE user_id = ? AND status != ?"""
+            if show_past_reservations:
+                query = f"""
+                    SELECT
+                        r.id AS id,
+                        u.id AS user_id,
+                        u.name AS user_name,
+                        u.email AS user_email,
+                        u.password AS user_password,
+                        u.career AS user_career,
+                        u.semester AS user_semester,
+                        u.role AS user_role,
+                        u.priority AS user_priority,
+                        u.created_at AS user_created_at,
+                        u.updated_at AS user_updated_at,
+                        r.room_id AS room_id,
+                        r.start_date AS start_date,
+                        r.end_date AS end_date,
+                        r.reserved_equipment AS reserved_equipment,
+                        rs.id AS status_id,
+                        rs.name AS status_name,
+                        rs.description AS status_description,
+                        rs.created_at AS status_created_at,
+                        rs.updated_at AS status_updated_at,
+                        r.comments AS comments,
+                        r.created_at AS created_at,
+                        r.updated_at AS updated_at
+                    FROM {config.ENVIRONMENT}.Reservations AS r
+                        INNER JOIN {config.ENVIRONMENT}.Users AS u ON u.id = r.user_id
+                        INNER JOIN {config.ENVIRONMENT}.ReservationStatus AS rs ON rs.id = r.status
+                    WHERE user_id = ? AND status != ?"""
+            else:
+                query = f"""
+                    SELECT
+                        r.id AS id,
+                        u.id AS user_id,
+                        u.name AS user_name,
+                        u.email AS user_email,
+                        u.password AS user_password,
+                        u.career AS user_career,
+                        u.semester AS user_semester,
+                        u.role AS user_role,
+                        u.priority AS user_priority,
+                        u.created_at AS user_created_at,
+                        u.updated_at AS user_updated_at,
+                        r.room_id AS room_id,
+                        r.start_date AS start_date,
+                        r.end_date AS end_date,
+                        r.reserved_equipment AS reserved_equipment,
+                        rs.id AS status_id,
+                        rs.name AS status_name,
+                        rs.description AS status_description,
+                        rs.created_at AS status_created_at,
+                        rs.updated_at AS status_updated_at,
+                        r.comments AS comments,
+                        r.created_at AS created_at,
+                        r.updated_at AS updated_at
+                    FROM {config.ENVIRONMENT}.Reservations AS r
+                        INNER JOIN {config.ENVIRONMENT}.Users AS u ON u.id = r.user_id
+                        INNER JOIN {config.ENVIRONMENT}.ReservationStatus AS rs ON rs.id = r.status
+                    WHERE user_id = ? AND status != ? AND start_date >= CAST(GETDATE() AS DATETIME2)"""
+
             cursor.execute(query, (user_id, cancelled_status.id))
 
             rows = cursor.fetchall()

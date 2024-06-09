@@ -30,8 +30,8 @@ class ReservationService:
         self.equipment_repository = EquipmentRepository()
         self.room_repository = RoomRepository()
 
-    def get_all_reservations(self) -> List[Reservation]:
-        reservations = self.reservation_repository.get_all_reservations()
+    def get_all_reservations(self, show_past_reservations: bool) -> List[Reservation]:
+        reservations = self.reservation_repository.get_all_reservations(show_past_reservations)
 
         return reservations
 
@@ -40,8 +40,8 @@ class ReservationService:
 
         return reservations
 
-    def get_reservations_by_user_id(self, user_id: str) -> List[Reservation]:
-        reservations = self.reservation_repository.get_reservations_by_user_id(user_id)
+    def get_reservations_by_user_id(self, show_past_reservations: bool, user_id: str) -> List[Reservation]:
+        reservations = self.reservation_repository.get_reservations_by_user_id(show_past_reservations, user_id)
 
         return reservations
 
