@@ -1,9 +1,14 @@
 from datetime import datetime, timedelta
 from calendar import monthrange
 
+from fastapi import HTTPException
+
+from app.db.models.application.reservations.reservation import Reservation
+from app.db.models.application.users.user import User
 from app.db.repositories.admin.admin_repository import AdminRepository
 from app.services.equipments.equipment_service import EquipmentService
 from app.services.reservationStatuses.reservation_status_service import ReservationStatusService
+from app.services.reservations.reservation_service import ReservationService
 from app.services.rooms.room_service import RoomService
 
 
@@ -11,12 +16,14 @@ class AdminService:
     reservation_status_service: ReservationStatusService
     room_service: RoomService
     equipment_service: EquipmentService
+    reservation_service: ReservationService
     admin_repository: AdminRepository
 
     def __init__(self):
         self.reservation_status_service = ReservationStatusService()
         self.room_service = RoomService()
         self.equipment_service = EquipmentService()
+        self.reservation_service = ReservationService()
         self.admin_repository = AdminRepository()
 
     async def get_reservations_between_dates(self, start_date: datetime, end_date: datetime):
@@ -217,4 +224,10 @@ class AdminService:
                 equipment_stats[equipment.name] += 1
 
         return equipment_stats
+
+    async def update_reservation_status(self, reservation_id: str, status_id: str) -> Reservation:
+        reservation = self.reservation_service.update_status(reservation_id, status_id)
+
+        return reservation
+
 

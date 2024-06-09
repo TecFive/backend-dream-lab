@@ -109,3 +109,13 @@ async def get_equipment_stats_monthly(current_user: User = Depends(has_admin_acc
         return equipment_stats
     except Exception as e:
         raise e
+
+
+@router.put("/reservations/status/{reservation_id}")
+async def update_reservation_status(reservation_id: str, status: str, current_user: User = Depends(has_admin_access)):
+    try:
+        reservation = await adminService.update_reservation_status(reservation_id, status)
+
+        return reservation
+    except Exception as e:
+        raise e

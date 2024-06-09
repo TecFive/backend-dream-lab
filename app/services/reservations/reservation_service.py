@@ -4,6 +4,7 @@ from typing import List
 import bson
 from fastapi import HTTPException
 
+from app.db.models.application.reservationStatus.reservation_status import ReservationStatus
 from app.db.models.application.reservations.reservation import Reservation
 from app.db.models.application.users.user import User
 from app.db.repositories.equipmentStatuses.equipment_status_repository import EquipmentStatusRepository
@@ -122,9 +123,26 @@ class ReservationService:
         reservation_found.end_date = update_reservation_dto.end_date
         reservation_found.reserved_equipment = update_reservation_dto.reserved_equipment
         reservation_found.comments = update_reservation_dto.comments
+        reservation_found.status = update_reservation_dto.status
         reservation_found.updated_at = datetime.now().isoformat()
 
         self.reservation_repository.update_reservation(reservation_found)
+
+    def update_status(self, reservation_id: str, status: str) -> Reservation:
+        reservation_found = self.reservation_repository.find_reservation_by_id(reservation_id)
+        if not reservation_found:
+            raise HTTPException(status_code=404, detail="Reservation could not be found")
+
+        status_found = self.reservation_status_repository.find_reservation_status_by_name(status)
+        if not status_found:
+            raise HTTPException(status_code=404, detail="Reservation status could not be found")
+
+        reservation_found.status = status_found
+        reservation_found.updated_at = datetime.now().isoformat()
+
+        self.reservation_repository.update_reservation(reservation_found)
+
+        return reservation_found
 
     def cancel_reservation(self, reservation_id: str, user: User) -> None:
         reservation_found = self.reservation_repository.find_reservation_by_id(reservation_id)
