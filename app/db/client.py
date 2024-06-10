@@ -20,8 +20,8 @@ class DatabaseClient:
             cursor = self.connection.cursor()
             return cursor
         except Exception as e:
-            print(e)
-            print('Cannot connect to SQL server')
+            if e.__class__ == pyodbc.ProgrammingError:
+                return self.get_conn()
 
     def commit(self) -> None:
         try:

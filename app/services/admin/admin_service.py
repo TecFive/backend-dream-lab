@@ -1,10 +1,7 @@
+import calendar
 from datetime import datetime, timedelta
-from calendar import monthrange
-
-from fastapi import HTTPException
 
 from app.db.models.application.reservations.reservation import Reservation
-from app.db.models.application.users.user import User
 from app.db.repositories.admin.admin_repository import AdminRepository
 from app.services.equipments.equipment_service import EquipmentService
 from app.services.reservationStatuses.reservation_status_service import ReservationStatusService
@@ -26,6 +23,21 @@ class AdminService:
         self.reservation_service = ReservationService()
         self.admin_repository = AdminRepository()
 
+    @staticmethod
+    def get_week_dates(date):
+        start_of_week = date - timedelta(days=date.weekday() + 1)
+        end_of_week = start_of_week + timedelta(days=6)
+        return start_of_week, end_of_week
+
+    @staticmethod
+    def get_month_dates(date):
+        year = date.year
+        month = date.month
+        _, last_day = calendar.monthrange(year, month)
+        start_of_month = datetime(year, month, 1)
+        end_of_month = datetime(year, month, last_day)
+        return start_of_month, end_of_month
+
     async def get_reservations_between_dates(self, start_date: datetime, end_date: datetime):
         filter_params = "WHERE start_date >= '" + str(start_date) + "' AND end_date <= '" + str(end_date) + "'"
         reservations = self.admin_repository.get_all_reservations(filter_params)
@@ -33,16 +45,16 @@ class AdminService:
         return reservations
 
     async def get_daily_reservations(self):
-        today = datetime.utcnow()
-        today_temp = today + timedelta(days=1)
+        start_date = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = start_date.replace(hour=23, minute=59, second=59, microsecond=0)
 
         approved_status = self.reservation_status_service.get_reservation_status_by_name("Approved")
         pending_status = self.reservation_status_service.get_reservation_status_by_name("Pending")
         completed_status = self.reservation_status_service.get_reservation_status_by_name("Completed")
 
-        approved_filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2) AND r.status='{approved_status.id}'"
-        pending_filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2) AND r.status='{pending_status.id}'"
-        completed_filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2) AND r.status='{completed_status.id}'"
+        approved_filter_params = f"WHERE r.start_date >= CAST('{start_date}' AS DATETIME2) AND r.end_date <= CAST('{end_date}' AS DATETIME2) AND r.status='{approved_status.id}'"
+        pending_filter_params = f"WHERE r.start_date >= CAST('{start_date}' AS DATETIME2) AND r.end_date <= CAST('{end_date}' AS DATETIME2) AND r.status='{pending_status.id}'"
+        completed_filter_params = f"WHERE r.start_date >= CAST('{start_date}' AS DATETIME2) AND r.end_date <= CAST('{end_date}' AS DATETIME2) AND r.status='{completed_status.id}'"
 
         approved_reservations = self.admin_repository.get_all_reservations(approved_filter_params)
         pending_reservations = self.admin_repository.get_all_reservations(pending_filter_params)
@@ -55,16 +67,16 @@ class AdminService:
         }
 
     async def get_weekly_reservations(self):
-        today = datetime.utcnow()
-        today_temp = today + timedelta(days=7)
+        today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        week_start, week_end = self.get_week_dates(today)
 
         approved_status = self.reservation_status_service.get_reservation_status_by_name("Approved")
         pending_status = self.reservation_status_service.get_reservation_status_by_name("Pending")
         completed_status = self.reservation_status_service.get_reservation_status_by_name("Completed")
 
-        approved_filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2) AND r.status='{approved_status.id}'"
-        pending_filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2) AND r.status='{pending_status.id}'"
-        completed_filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2) AND r.status='{completed_status.id}'"
+        approved_filter_params = f"WHERE r.start_date >= CAST('{week_start}' AS DATETIME2) AND r.end_date <= CAST('{week_end}' AS DATETIME2) AND r.status='{approved_status.id}'"
+        pending_filter_params = f"WHERE r.start_date >= CAST('{week_start}' AS DATETIME2) AND r.end_date <= CAST('{week_end}' AS DATETIME2) AND r.status='{pending_status.id}'"
+        completed_filter_params = f"WHERE r.start_date >= CAST('{week_start}' AS DATETIME2) AND r.end_date <= CAST('{week_end}' AS DATETIME2) AND r.status='{completed_status.id}'"
 
         approved_reservations = self.admin_repository.get_all_reservations(approved_filter_params)
         pending_reservations = self.admin_repository.get_all_reservations(pending_filter_params)
@@ -116,10 +128,10 @@ class AdminService:
         return reservations_per_month
 
     async def get_weekly_reserved_rooms(self):
-        today = datetime.utcnow()
-        today_temp = today + timedelta(days=7)
+        today = datetime.today()
+        week_start, week_end = self.get_week_dates(today)
 
-        filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2)"
+        filter_params = f"WHERE r.start_date >= CAST('{week_start}' AS DATETIME2) AND r.end_date <= CAST('{week_end}' AS DATETIME2)"
         reservations = self.admin_repository.get_all_reservations(filter_params)
 
         room_stats = {}
@@ -133,10 +145,10 @@ class AdminService:
         return room_stats
 
     async def get_weekly_reserved_equipment(self):
-        today = datetime.utcnow()
-        today_temp = today + timedelta(days=7)
+        today = datetime.today()
+        week_start, week_end = self.get_week_dates(today)
 
-        filter_params = f"WHERE r.start_date >= CAST('{today_temp}' AS DATETIME2) AND r.end_date <= CAST('{today}' AS DATETIME2)"
+        filter_params = f"WHERE r.start_date >= CAST('{week_start}' AS DATETIME2) AND r.end_date <= CAST('{week_end}' AS DATETIME2)"
         reservations = self.admin_repository.get_all_reservations(filter_params)
 
         equipment_stats = {}
@@ -151,23 +163,10 @@ class AdminService:
         return equipment_stats
 
     async def get_monthly_reserved_rooms(self):
-        # Get the current date
-        current_date = datetime.now()
+        today = datetime.today()
+        month_start, month_end = self.get_month_dates(today)
 
-        # Calculate the start date of the current month
-        start_date = current_date.replace(day=1)
-
-        # Calculate the end date of the current month
-        # First, get the start of the next month
-        if current_date.month == 12:
-            next_month_start = current_date.replace(year=current_date.year + 1, month=1, day=1)
-        else:
-            next_month_start = current_date.replace(month=current_date.month + 1, day=1)
-
-        # The end date of the current month is one day before the start of the next month
-        end_date = next_month_start - timedelta(days=1)
-
-        filter_params = f"WHERE r.start_date >= CAST('{start_date}' AS DATETIME2) AND r.start_date <= CAST('{end_date}' AS DATETIME2)"
+        filter_params = f"WHERE r.start_date >= CAST('{month_start}' AS DATETIME2) AND r.start_date <= CAST('{month_end}' AS DATETIME2)"
         reservations = self.admin_repository.get_all_reservations(filter_params)
 
         room_stats = {}
@@ -206,9 +205,9 @@ class AdminService:
         return equipment_stats_per_month
 
     async def get_equipment_stats_monthly(self):
-        year = datetime.utcnow().year
-        month = datetime.utcnow().month
-        max_day_of_month = monthrange(year, month)[1]
+        year = datetime.today().year
+        month = datetime.today().month
+        max_day_of_month = calendar.monthrange(year, month)[1]
 
         equipment_stats = {}
         all_equipment = self.equipment_service.get_equipments()
