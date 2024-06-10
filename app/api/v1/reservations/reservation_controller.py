@@ -15,7 +15,7 @@ reservationService = ReservationService()
 
 
 @router.get("/")
-async def get_all_reservations(show_past_reservations: Optional[bool] = True):
+async def get_all_reservations(show_past_reservations: Optional[bool] = False):
     try:
         reservations = reservationService.get_all_reservations(show_past_reservations)
 
@@ -25,7 +25,7 @@ async def get_all_reservations(show_past_reservations: Optional[bool] = True):
 
 
 @router.get("/my-reservations")
-async def get_my_reservations(show_past_reservations: Optional[bool] = True, current_user: User = Depends(get_current_user)):
+async def get_my_reservations(show_past_reservations: Optional[bool] = False, current_user: User = Depends(get_current_user)):
     try:
         reservations = reservationService.get_reservations_by_user_id(show_past_reservations, current_user.id)
 
