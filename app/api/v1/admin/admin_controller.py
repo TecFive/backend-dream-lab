@@ -15,7 +15,7 @@ adminService = AdminService()
 @router.get("/all-stats")
 async def get_all_stats(current_user: User = Depends(has_admin_access)):
     daily_reservations = await adminService.get_daily_reservations()
-    weekly_reservations = await adminService.get_weekly_reservations()
+    weekly_reserved_rooms = await adminService.get_weekly_reserved_rooms()
     monthly_reservations = await adminService.get_monthly_reserved_rooms()
     all_time_reservations = await adminService.get_all_time_reservations()
     reservations_per_month = await adminService.get_reservations_per_month()
@@ -26,7 +26,7 @@ async def get_all_stats(current_user: User = Depends(has_admin_access)):
 
     return {
         "daily_reservations": daily_reservations,
-        "weekly_reservations": weekly_reservations,
+        "weekly_reserved_rooms": weekly_reserved_rooms,
         "monthly_reservations": monthly_reservations,
         "all_time_reservations": all_time_reservations,
         "reservations_per_month": reservations_per_month,
