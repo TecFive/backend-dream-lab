@@ -11,11 +11,11 @@ class DatabaseClient:
     connection: Optional[pyodbc.Connection] = None
 
     def __init__(self):
-        self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
+        self.connection = pyodbc.connect(f"Driver={config.AZURE_DATABASE_DRIVER};Server=tcp:{config.AZURE_DATABASE_URL},1433;Database={config.AZURE_DATABASE_NAME};Uid={config.AZURE_DATABASE_USER};Pwd={config.AZURE_DATABASE_PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=60;")
 
     def get_conn(self) -> pyodbc.Cursor:
         try:
-            self.connection = pyodbc.connect('DRIVER=' + config.AZURE_DATABASE_DRIVER + ';SERVER=' + config.AZURE_DATABASE_URL + ';DATABASE=' + config.AZURE_DATABASE_NAME + ';UID=' + config.AZURE_DATABASE_USER + ';PWD=' + config.AZURE_DATABASE_PASSWORD)
+            self.connection = pyodbc.connect(f"Driver={config.AZURE_DATABASE_DRIVER};Server=tcp:{config.AZURE_DATABASE_URL},1433;Database={config.AZURE_DATABASE_NAME};Uid={config.AZURE_DATABASE_USER};Pwd={config.AZURE_DATABASE_PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=60;")
 
             cursor = self.connection.cursor()
             return cursor
