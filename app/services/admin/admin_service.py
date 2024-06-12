@@ -39,6 +39,9 @@ class AdminService:
         return start_of_month, end_of_month
 
     async def get_reservations_between_dates(self, start_date: datetime, end_date: datetime):
+        start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
+
         filter_params = "WHERE start_date >= '" + str(start_date) + "' AND end_date <= '" + str(end_date) + "'"
         reservations = self.admin_repository.get_all_reservations(filter_params)
 
