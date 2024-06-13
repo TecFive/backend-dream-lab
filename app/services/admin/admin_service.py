@@ -38,6 +38,7 @@ class AdminService:
         end_of_month = datetime(year, month, last_day)
         return start_of_month, end_of_month
 
+
     async def get_reservations_between_dates(self, start_date: datetime, end_date: datetime):
         start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
         end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=0)
